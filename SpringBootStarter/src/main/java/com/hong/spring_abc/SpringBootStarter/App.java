@@ -1,4 +1,4 @@
-package com.hong.spring_abc.springboot.SpringBootStarter;
+package com.hong.spring_abc.SpringBootStarter;
 
 /**
  * Hello world!
