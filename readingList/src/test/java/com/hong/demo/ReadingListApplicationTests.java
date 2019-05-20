@@ -1,4 +1,4 @@
-package com.hong;
+package com.hong.demo;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
