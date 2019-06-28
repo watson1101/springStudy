@@ -1,1 +1,0 @@
-Spring Cloud Demo 程序，参考的书籍是周立的Spring Cloud 与 Docker 微服务架构实战。
