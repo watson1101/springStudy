@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+    <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+  <mapper namespace="com.hong.dao.WordDao">
+
+    <resultMap id="WordMap" type="com.hong.entity.WordEntity">
+        <id column="id" jdbcType="NUMERIC" property="id"/>
+        <result column="word" jdbcType="VARCHAR" property="word"/>
+        <result column="meaning" jdbcType="VARCHAR" property="meaning"/>
+        <result column="searchcount" jdbcType="NUMERIC" property="searchCount"/>
+        <result column="negativecount" jdbcType="NUMERIC" property="negativeCount"/>
+        <result column="positivecount" jdbcType="NUMERIC" property="positiveCount"/>
+    </resultMap>
+
+    <select id="searchWord" resultMap="WordMap" parameterType="com.hong.entity.WordEntity">
+        SELECT id, word, meaning, searchcount, negativecount, positivecount FROM word
+        WHERE  word = #{word}
+
+    </select>
+
+    <insert id="save" parameterType="com.hong.entity.WordEntity">
+        insert into word
+        (word, meaning, searchcount, negativecount, positivecount)
+        values
+            (
+            #{word},
+            #{meaning},
+            1,
+            1,
+            0
+            )
+    </insert>
+
+<!--    <update id="updateImportFileStatus" parameterType="com.chinamobile.cmss.task.dto.ImportFileStatusDto">
+        update import_file_status set status = #{status}, line_num = #{lineNum}, success_num = #{successNum}
+            where filepath = #{filePath} and createdate = #{createDate}
+    </update>-->
+
+</mapper>
