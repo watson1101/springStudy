@@ -43,13 +43,14 @@ public class WordsController {
     @RequestMapping("/word/{word}")
     public String getTranslate(@PathVariable("word") String word) {
         if (StringUtils.isNotBlank(word)) {
-            word = word.trim();
+            word = word.trim().toLowerCase();
             WordEntity wordEntity = new WordEntity();
             wordEntity.setWord(word);
             List<WordEntity> list = wordService.searchDatabase(wordEntity);
             if (list != null && list.size() > 0) {
-                Gson gson = new Gson();
-                return gson.toJson(list.get(0));
+//                Gson gson = new Gson();
+//                return gson.toJson(list.get(0));
+                return list.get(0).getMeaning();
             }
             try {
                 String meaning = consultFromYoudao.consult(word);
