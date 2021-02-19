@@ -17,7 +17,7 @@ public class GlobalExceptionHandler {
     public ResponseData defaultErrorHandler(HttpServletRequest request, Exception e)
         throws Exception {
         ResponseData r = new ResponseData();
-        logger.error("", e);
+        logger.error("error--------->", e);
         r.setMessage(e.getMessage());
         if (e instanceof org.springframework.web.servlet.NoHandlerFoundException) {
             r.setCode(4040);
