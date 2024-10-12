@@ -20,6 +20,14 @@
     </properties>
 
     <dependencies>
+
+        <dependency>
+            <groupId>com.hong.springcloud</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot</artifactId>
@@ -27,7 +35,7 @@
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus</artifactId>
-            <version>3.5.2</version>
+            <version>3.5.3.1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -82,6 +90,7 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+
 
     </dependencies>
     <build>
