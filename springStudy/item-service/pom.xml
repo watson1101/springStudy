@@ -46,6 +46,12 @@
             <version>${nacos-discovery.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version> <!-- 请根据需要选择版本 -->
+        </dependency>
+
     </dependencies>
 
 </project>

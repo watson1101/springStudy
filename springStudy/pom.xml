@@ -33,6 +33,7 @@
         <nacos-discovery.version>2023.0.3.2</nacos-discovery.version>
         <hutool.version>5.8.37</hutool.version>
         <postgresql.version>42.7.3</postgresql.version>
+        <fastjson.version>2.0.43</fastjson.version>
     </properties>
 
     <dependencies>
@@ -139,6 +140,11 @@
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-core</artifactId>
             <version>${hutool.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version> <!-- 请根据需要选择版本 -->
         </dependency>
     </dependencies>
 
