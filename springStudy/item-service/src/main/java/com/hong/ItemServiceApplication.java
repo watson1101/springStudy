@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class ItemServiceApplication {
     public static void main(String[] args) {
 
-        log.info("Hello world, this is item service.");
+        log.info("-------------------------------------> Hello, this is item service.");
         SpringApplication.run(ItemServiceApplication.class, args);
     }
 }

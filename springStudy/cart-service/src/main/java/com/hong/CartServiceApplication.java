@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 public class CartServiceApplication {
     public static void main(String[] args) {
-        log.info("Hello world, this is cart service.");
+        log.info("-------------------------------------> Hello, this is cart service.");
         SpringApplication.run(CartServiceApplication.class, args);
     }
     @Bean
