@@ -1,6 +1,7 @@
 package com.hong.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.RandomUtil;
 import com.hong.domain.vo.CartVO;
 import com.hong.domain.dto.ItemDTO;
 import com.hong.service.CartService;
@@ -8,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.ServiceInstance;
 import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -53,8 +55,9 @@ public class CartServiceImpl implements CartService {
 
     }
 
-    @Override
-    public void handleCartItems(List<CartVO> vos) {
+    // URL 写死的远程调用
+//    @Override
+    public void handleCartItemsV1(List<CartVO> vos) {
         // get all item ids from cart items
         Set<Long> itemsIds = vos.stream()
                 .map(CartVO::getItemId)
@@ -83,6 +86,49 @@ public class CartServiceImpl implements CartService {
                 .collect(Collectors.toMap(ItemDTO::getId, itemDTO -> itemDTO));
         log.info("itemMap: {}", itemMap);
 
+    }
+
+    /**
+     * 使用服务发现的随机实例的远程调用
+     * 服务只需要引入 nacos的 discovery 依赖，然后配置nacos地址，即可完成服务注册
+     * @param vos
+     */
+
+    @Override
+    public void handleCartItems(List<CartVO> vos) {
+        // get all item ids from cart items
+        Set<Long> itemsIds = vos.stream()
+                .map(CartVO::getItemId)
+                .collect(Collectors.toSet());
+        List<ServiceInstance> instances = discoveryClient.getInstances("item-service");
+        if (instances.isEmpty()) {
+            return;
+        }
+        // 随机选择一个实例
+        ServiceInstance serviceInstance = instances.get(RandomUtil.randomInt(instances.size()));
+        // 查询商品
+        ResponseEntity<List<ItemDTO>> responseEntity = restTemplate.exchange(
+                serviceInstance.getUri()+"/items?ids={ids}",
+                HttpMethod.GET,
+                null,
+                // 字节码中没有泛型，泛型被擦除，所以需要使用 ParameterizedTypeReference，参数化类型的引用
+                // List<ItemDTO>.class
+                new ParameterizedTypeReference<List<ItemDTO>>() {
+                },
+                // CollUtil.join(itemsIds, ",") 连接成字符串
+                Map.of("ids", CollUtil.join(itemsIds, ","))
+        );
+        // 解析响应
+        if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+            return;
+        }
+        List<ItemDTO> items = responseEntity.getBody();
+        if (items.isEmpty()) {
+            return;
+        }
+        Map<Long, ItemDTO> itemMap = items.stream()
+                .collect(Collectors.toMap(ItemDTO::getId, itemDTO -> itemDTO));
+        log.info("itemMap: {}", itemMap);
 
     }
 }

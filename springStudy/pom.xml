@@ -32,6 +32,7 @@
         <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
         <nacos-discovery.version>2023.0.3.2</nacos-discovery.version>
         <hutool.version>5.8.37</hutool.version>
+        <postgresql.version>42.7.3</postgresql.version>
     </properties>
 
     <dependencies>
@@ -118,6 +119,7 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+            <version>${postgresql.version}</version>
         </dependency>
 
         <dependency>

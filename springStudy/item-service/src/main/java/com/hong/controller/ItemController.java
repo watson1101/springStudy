@@ -24,6 +24,7 @@ public class ItemController {
     public String getItems(@RequestParam("ids") String ids) {
         log.info("get items by ids: {}", ids);
         itemService.getItems(ids);
+        return null;
     }
 
 
