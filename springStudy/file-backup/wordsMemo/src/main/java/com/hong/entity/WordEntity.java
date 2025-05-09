@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.hong.entity;
+package com.hong.domain;
 
 /**
  * @author hong

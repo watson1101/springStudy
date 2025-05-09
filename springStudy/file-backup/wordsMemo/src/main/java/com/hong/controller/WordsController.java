@@ -4,7 +4,7 @@
 package com.hong.controller;
 
 import com.google.gson.Gson;
-import com.hong.entity.WordEntity;
+import com.hong.domain.WordEntity;
 import com.hong.service.WordService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -6,7 +6,9 @@ import com.hong.domain.dto.ItemDTO;
 import com.hong.service.CartService;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 @Service
 //@AllArgsConstructor
 @RequiredArgsConstructor
+@Slf4j
 public class CartServiceImpl implements CartService {
 
     // Autowired 注入
@@ -36,6 +39,10 @@ public class CartServiceImpl implements CartService {
 //    public CartServiceImpl(RestTemplate restTemplate) {
 //        this.restTemplate = restTemplate;
 //    }
+
+    private final DiscoveryClient discoveryClient;
+
+
 
 
     @Override
@@ -64,6 +71,17 @@ public class CartServiceImpl implements CartService {
                 // CollUtil.join(itemsIds, ",") 连接成字符串
                 Map.of("ids", CollUtil.join(itemsIds, ","))
         );
+        // 解析响应
+        if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+            return;
+        }
+        List<ItemDTO> items = responseEntity.getBody();
+        if (items.isEmpty()) {
+            return;
+        }
+        Map<Long, ItemDTO> itemMap = items.stream()
+                .collect(Collectors.toMap(ItemDTO::getId, itemDTO -> itemDTO));
+        log.info("itemMap: {}", itemMap);
 
 
     }

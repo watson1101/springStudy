@@ -2,7 +2,7 @@
     <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
   <mapper namespace="com.hong.dao.WordDao">
 
-    <resultMap id="WordMap" type="com.hong.entity.WordEntity">
+    <resultMap id="WordMap" type="com.hong.domain.WordEntity">
         <id column="id" jdbcType="NUMERIC" property="id"/>
         <result column="word" jdbcType="VARCHAR" property="word"/>
         <result column="meaning" jdbcType="VARCHAR" property="meaning"/>
@@ -11,13 +11,13 @@
         <result column="positivecount" jdbcType="NUMERIC" property="positiveCount"/>
     </resultMap>
 
-    <select id="searchWord" resultMap="WordMap" parameterType="com.hong.entity.WordEntity">
+    <select id="searchWord" resultMap="WordMap" parameterType="com.hong.domain.WordEntity">
         SELECT id, word, meaning, searchcount, negativecount, positivecount FROM word
         WHERE  word = #{word}
 
     </select>
 
-    <insert id="save" parameterType="com.hong.entity.WordEntity">
+    <insert id="save" parameterType="com.hong.domain.WordEntity">
         insert into word
         (word, meaning, searchcount, negativecount, positivecount)
         values

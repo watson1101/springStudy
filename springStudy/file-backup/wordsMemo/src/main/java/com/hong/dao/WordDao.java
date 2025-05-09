@@ -1,6 +1,6 @@
 package com.hong.dao;
 
-import com.hong.entity.WordEntity;
+import com.hong.domain.WordEntity;
 import java.util.List;
 import org.springframework.stereotype.Component;
 

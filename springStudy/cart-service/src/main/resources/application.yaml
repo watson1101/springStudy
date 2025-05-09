@@ -4,7 +4,7 @@ server:
 
 spring:
   application:
-    name: item-service
+    name: cart-service
   cloud:
     nacos:
       discovery:

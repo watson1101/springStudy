@@ -1,6 +1,6 @@
 package com.hong.service.impl;
 
-import com.hong.entity.WordEntity;
+import com.hong.domain.WordEntity;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
