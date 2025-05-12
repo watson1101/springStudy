@@ -9,28 +9,22 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>cart-service</artifactId>
+    <artifactId>demo-api</artifactId>
 
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <nacos-discovery.version>2023.0.3.2</nacos-discovery.version>
     </properties>
 
     <dependencies>
-        <!-- https://mvnrepository.com/artifact/com.alibaba.cloud/spring-cloud-starter-alibaba-nacos-discovery -->
         <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-            <version>${nacos-discovery.version}</version>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>1.6.6</version>
+            <scope>compile</scope>
         </dependency>
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-core</artifactId>
-            <version>${hutool.version}</version>
-        </dependency>
-        <!-- 如果引入了api模块，则以下依赖直接移到api模块，这里不再需要 -->
+
         <!-- openfeign 与 负载均衡 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -42,20 +36,12 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
             <version>3.1.4</version>
         </dependency>
-<!-- okhttp 依赖 -->
+        <!-- okhttp 依赖 -->
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-okhttp</artifactId>
             <version>13.5</version>
         </dependency>
-        <!-- 如果引入了api模块，则以下依赖直接移到api模块，这里不再需要 -->
-
-        <dependency>
-            <groupId>com.hong</groupId>
-            <artifactId>demo-api</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-
     </dependencies>
 
 

@@ -10,15 +10,27 @@ spring:
       discovery:
         server-addr: 192.168.2.10:8848
   datasource:
-    url: jdbc:mysql://${spring.database.mysql.host}:3306/test?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=true
-    username: hong
+    database:
+      postgres:
+        host: 192.168.2.10
+    url: jdbc:postgresql://${spring.datasource.database.postgres.host}:5432/item-service
+    username: postgres
     password: 123456
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  database:
-    mysql:
-      host: 192.168.2.10
+    driver-class-name: org.postgresql.Driver
+
+logging:
+  level:
+    com.hong: debug
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss:SSS
+  file:
+    path: "logs/${spring.application.name}"
 
 mybatis:
   config-location: classpath:mybatis/mybatis-config.xml
   mapper-locations: classpath:mybatis/mapper/*.xml
   type-aliases-package: com.hong.domain
+feign:
+  okhttp:
+    enabled: true # 启用okhttp连接池
+

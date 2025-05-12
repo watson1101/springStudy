@@ -19,6 +19,7 @@
         <module>common</module>
         <module>cart-service</module>
         <module>item-service</module>
+        <module>demo-api</module>
     </modules>
 
     <properties>
@@ -29,7 +30,7 @@
         <spring-cloud-alibab.version>2023.0.1.2</spring-cloud-alibab.version>
         <spring-boot.version>3.3.11</spring-boot.version>
         <mysql.version>8.0.33</mysql.version>
-        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <mybatis-plus.version>3.5.12</mybatis-plus.version>
         <nacos-discovery.version>2023.0.3.2</nacos-discovery.version>
         <hutool.version>5.8.37</hutool.version>
         <postgresql.version>42.7.3</postgresql.version>
@@ -88,7 +89,8 @@
 
         <dependency>
             <groupId>com.baomidou</groupId>
-            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <!--<artifactId>mybatis-plus-boot-starter</artifactId>-->
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
             <version>${mybatis-plus.version}</version>
         </dependency>
 
@@ -99,11 +101,11 @@
         </dependency>
 
         <!--mysql-->
-        <dependency>
+<!--        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
-        </dependency>
+        </dependency>-->
 
         <!--redis-->
         <dependency>

@@ -1,6 +1,7 @@
 package com.hong.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hong.domain.ItemVO;
 import com.hong.mapper.ItemMapper;
 import com.hong.service.ItemService;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ItemServiceImpl implements ItemService {
+public class ItemServiceImpl extends ServiceImpl<ItemMapper, ItemVO> implements ItemService {
 
     private final ItemMapper itemMapper;
 
@@ -32,7 +33,8 @@ public class ItemServiceImpl implements ItemService {
             return null;
         }
         // 调用 Mapper 查询
-        return itemMapper.selectByIds(idList);
+//        return itemMapper.selectByIds(idList);
+        return itemMapper.selectBatchIds(idList);
 
     }
 

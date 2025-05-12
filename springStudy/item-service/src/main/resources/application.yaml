@@ -26,7 +26,24 @@ spring:
     password: 123456
     driver-class-name: org.postgresql.Driver
 
-mybatis:
-  config-location: classpath:mybatis/mybatis-config.xml
-  mapper-locations: classpath:mybatis/mapper/*.xml
-  type-aliases-package: com.hong.domain
+logging:
+  level:
+    com.hong: debug
+  pattern:
+    dateformat: yyyy-MM-dd HH:mm:ss:SSS
+  file:
+    path: "logs/${spring.application.name}"
+
+
+#mybatis:
+#  config-location: classpath:mybatis/mybatis-config.xml
+#  mapper-locations: classpath:**/mapper/*.xml
+#  type-aliases-package: com.hong.domain
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    mapUnderscoreToCamelCase: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl # 控制台打印SQL
+  global-config:
+    db-config:
+      id-type: auto # 主键类型自动识别数据库
