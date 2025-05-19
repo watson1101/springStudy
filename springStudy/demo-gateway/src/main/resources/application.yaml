@@ -1,0 +1,38 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: gateway
+  cloud:
+    nacos:
+      server-addr: 192.168.2.10:8848
+      gateway:
+        routes:
+          - id: item-service
+            uri: lb://item-service
+            predicates:
+              - Path=/item/**
+              - Path=/item-service/**
+#              - Path=/item/**,/item-service/**
+            filters:
+              - StripPrefix=1
+          - id: cart-service
+            uri: lb://cart-service
+            predicates:
+              - Path=/carts/**,/cart-service/**
+        default-filters:
+          - AddRequestHeader=hello,this is gateway filter，add msg to header.
+          #- PrintAny=123  ##这个是 GatewayFilter 指定的过滤器名，demo 中未实现
+
+demo:
+  jwt:
+    location: classpath:jwt.jks
+    password: demo123
+    alias: demo
+    tokenTTL: 30m
+  auth:
+    excludePaths:
+      - /search/**
+      - /users/login
+      - /item/**
+      - /test

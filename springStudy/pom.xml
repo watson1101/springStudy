@@ -20,6 +20,7 @@
         <module>cart-service</module>
         <module>item-service</module>
         <module>demo-api</module>
+        <module>demo-gateway</module>
     </modules>
 
     <properties>
@@ -27,7 +28,9 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-cloud.version>2023.0.1</spring-cloud.version>
+        <spring-cloud-gateway.version>4.2.2</spring-cloud-gateway.version>
         <spring-cloud-alibab.version>2023.0.1.2</spring-cloud-alibab.version>
+        <spring-cloud-loadbalancer.version>3.1.4</spring-cloud-loadbalancer.version>
         <spring-boot.version>3.3.11</spring-boot.version>
         <mysql.version>8.0.33</mysql.version>
         <mybatis-plus.version>3.5.12</mybatis-plus.version>
@@ -47,13 +50,23 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+            <version>${spring-cloud-gateway.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-alibaba-dependencies</artifactId>
             <version>${spring-cloud-alibab.version}</version>
             <type>pom</type>
             <scope>import</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+            <version>${spring-cloud-loadbalancer.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot</artifactId>
@@ -86,18 +99,22 @@
             <artifactId>spring-boot-devtools</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!--redis-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>com.baomidou</groupId>
             <!--<artifactId>mybatis-plus-boot-starter</artifactId>-->
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
             <version>${mybatis-plus.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <!--mysql-->
@@ -107,11 +124,7 @@
             <version>${mysql.version}</version>
         </dependency>-->
 
-        <!--redis-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
+
 
         <dependency>
             <groupId>org.apache.commons</groupId>
