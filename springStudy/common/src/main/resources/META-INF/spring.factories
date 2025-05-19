@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.hong.config.MvcConfig,\
+  com.hong.config.JsonConfig
