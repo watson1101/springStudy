@@ -25,13 +25,27 @@
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
             <version>${nacos-discovery.version}</version>
         </dependency>
+
+        <!-- nacos 配置管理 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+            <version>${nacos-config.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+            <version>${spring-cloud-starter-bootstrap.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-core</artifactId>
             <version>${hutool.version}</version>
         </dependency>
         <!-- 如果引入了api模块，则以下依赖直接移到api模块，这里不再需要 -->
-        <!-- openfeign 与 负载均衡 -->
+<!--        &lt;!&ndash; openfeign 与 负载均衡 &ndash;&gt;
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
@@ -42,13 +56,13 @@
             <artifactId>spring-cloud-starter-loadbalancer</artifactId>
             <version>3.1.4</version>
         </dependency>
-<!-- okhttp 依赖 -->
+&lt;!&ndash; okhttp 依赖 &ndash;&gt;
         <dependency>
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-okhttp</artifactId>
             <version>13.5</version>
-        </dependency>
-        <!-- 如果引入了api模块，则以下依赖直接移到api模块，这里不再需要 -->
+        </dependency>-->
+        <!-- 如果引入了api模块，则以上依赖直接移到api模块，这里不再需要 -->
 
         <dependency>
             <groupId>com.hong</groupId>

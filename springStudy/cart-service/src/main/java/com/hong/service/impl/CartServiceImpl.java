@@ -2,6 +2,8 @@ package com.hong.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.RandomUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.hong.config.CartProperties;
 import com.hong.domain.vo.CartVO;
 //import com.hong.domain.dto.ItemDTO;
 import com.hong.api.dto.ItemDTO;
@@ -26,6 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.baomidou.mybatisplus.core.toolkit.Wrappers.lambdaQuery;
+
 @Service
 //@AllArgsConstructor
 @RequiredArgsConstructor
@@ -48,8 +52,10 @@ public class CartServiceImpl implements CartService {
 
     private final DiscoveryClient discoveryClient;
 
-// OpenFeign, 有这个则不在需要 RestTemplate 方式调用
+    // OpenFeign, 有这个则不在需要 RestTemplate 方式调用
     private final ItemClient itemClient;
+
+    private final CartProperties cartProperties;
 
 
     @Override
@@ -96,6 +102,7 @@ public class CartServiceImpl implements CartService {
     /**
      * 使用服务发现的随机实例的远程调用
      * 服务只需要引入 nacos的 discovery 依赖，然后配置nacos地址，即可完成服务注册
+     *
      * @param vos
      */
 
@@ -113,7 +120,7 @@ public class CartServiceImpl implements CartService {
         ServiceInstance serviceInstance = instances.get(RandomUtil.randomInt(instances.size()));
         // 查询商品
         ResponseEntity<List<ItemDTO>> responseEntity = restTemplate.exchange(
-                serviceInstance.getUri()+"/items?ids={ids}",
+                serviceInstance.getUri() + "/items?ids={ids}",
                 HttpMethod.GET,
                 null,
                 // 字节码中没有泛型，泛型被擦除，所以需要使用 ParameterizedTypeReference，参数化类型的引用
@@ -140,7 +147,7 @@ public class CartServiceImpl implements CartService {
     /**
      * 使用 openFeign 的远程调用
      */
-    public void handleCartItemsOpenFeign(List<CartVO> vos){
+    public void handleCartItemsOpenFeign(List<CartVO> vos) {
         Set<Long> itemsIds = vos.stream()
                 .map(CartVO::getItemId)
                 .collect(Collectors.toSet());
@@ -153,6 +160,15 @@ public class CartServiceImpl implements CartService {
         log.info("handleCartItemsOpenFeign-->items: {}", items);
         // ……
 
+    }
+
+    private void checkCartFull(Long userId) throws Exception {
+//        int count = lambdaQuery().eq(CartVO::getUserId, userId).count();
+        // todo
+        int count = 10;
+        if (count >= cartProperties.getMaxItems()) {
+            throw new Exception("购物车已满");
+        }
     }
 
 

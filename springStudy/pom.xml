@@ -27,14 +27,18 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
         <spring-cloud.version>2023.0.1</spring-cloud.version>
         <spring-cloud-gateway.version>4.2.2</spring-cloud-gateway.version>
         <spring-cloud-alibab.version>2023.0.1.2</spring-cloud-alibab.version>
         <spring-cloud-loadbalancer.version>3.1.4</spring-cloud-loadbalancer.version>
+        <spring-cloud-starter-bootstrap.version>4.2.1</spring-cloud-starter-bootstrap.version>
+
         <spring-boot.version>3.3.11</spring-boot.version>
         <mysql.version>8.0.33</mysql.version>
         <mybatis-plus.version>3.5.12</mybatis-plus.version>
         <nacos-discovery.version>2023.0.3.2</nacos-discovery.version>
+        <nacos-config.version>2023.0.3.2</nacos-config.version>
         <hutool.version>5.8.37</hutool.version>
         <postgresql.version>42.7.3</postgresql.version>
         <fastjson.version>2.0.43</fastjson.version>

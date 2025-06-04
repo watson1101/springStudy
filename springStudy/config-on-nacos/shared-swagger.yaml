@@ -1,0 +1,15 @@
+knife4j:
+  enable: true
+  openapi:
+    title: ${hong.swagger.title:黑马商城接口文档}
+    description: ${hong.swagger.description:黑马商城接口文档}
+    email: ${hong.swagger.email:anye2009@aliyun.com}
+    concat: ${hong.swagger.concat:hong}
+    url: https://www.hong.com
+    version: v1.0.0
+    group:
+      default:
+        group-name: default
+        api-rule: package
+        api-rule-resources:
+          - ${hong.swagger.package}

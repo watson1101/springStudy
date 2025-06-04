@@ -19,6 +19,13 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.hong</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
             <groupId>io.swagger</groupId>
             <artifactId>swagger-annotations</artifactId>
             <version>1.6.6</version>
@@ -42,6 +49,7 @@
             <artifactId>feign-okhttp</artifactId>
             <version>13.5</version>
         </dependency>
+
     </dependencies>
 
 

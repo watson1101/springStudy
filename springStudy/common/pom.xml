@@ -9,7 +9,7 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.hong.springcloud</groupId>
+    <!--<groupId>com.hong.springcloud</groupId>-->
     <artifactId>common</artifactId>
 
     <properties>
