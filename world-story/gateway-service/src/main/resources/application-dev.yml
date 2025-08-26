@@ -1,0 +1,46 @@
+server:
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          enabled: true # 开启从注册中心动态创建路由的功能
+          lower-case-service-id: true # 使用小写服务名，默认是大写
+      routes:
+        - id: haven-world-route
+          uri: lb://haven-world
+          predicates:
+            - Path=/haven/**
+          filters:
+            - StripPrefix=1
+        - id: human-world-route
+          uri: lb://human-world
+          predicates:
+            - Path=/human/**
+          filters:
+            - StripPrefix=1
+        - id: under-world-route
+          uri: lb://under-world
+          predicates:
+            - Path=/under/**
+          filters:
+            - StripPrefix=1
+
+  redis:
+    host: xxx.hong.com
+    port: 6379
+    database: 0
+    timeout: 1800000
+    lettuce:
+      pool:
+        max-active: 20
+        max-wait: -1
+        max-idle: 5
+        min-idle: 0
+
+logging:
+  level:
+    com.hong.gateway: debug
+    org.springframework.cloud.gateway: debug

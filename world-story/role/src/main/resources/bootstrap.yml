@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: role-service
+  cloud:
+    nacos:
+      discovery:
+        server-addr: xxx.hong.com:8848
+      config:
+        server-addr: xxx.hong.com:8848
+        file-extension: yml
+        namespace: world-story
+        group: DEFAULT_GROUP
+  profiles:
+    active: dev

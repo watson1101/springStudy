@@ -12,13 +12,24 @@
 
   <body>
     <div id="app">
+      <div>===表达式===</div>
       <!-- {{}} 会将数据解析为普通文本，所以显示的是 hello <span color='red'> MY </span> world -->
       {{message}} <br />
       <!-- v-html 会将数据解析为 HTML，所以显示的是 hello MY  world ,MY 颜色为红色 -->
       <div v-html="message"></div>
       <a href="page1-vue3.html">Go to Page 1</a>
       <br />
-      <a v-bind:href="herf01">传参超链接</a> <!-- 注意：v-vbind 可以省略，即写成    :href  就可以（冒号需要保留） -->
+      <a v-bind:href="herf01">传参超链接</a>
+      <!-- 注意：v-vbind 可以省略，即写成    :href  就可以（冒号需要保留） -->
+      <div>number+1 = {{number +1}}</div>
+      <div>三元表达式：{{ok ? 'YES':'NO'}}</div>
+      <div :id="'list-' + id">张三（id属性通过表达式拼接）</div>
+      <a v-bind:[attributename]="url">百度url(属性和值均有变量定义)</a>
+      <!-- 注意：不支持大写：attributeName  --><br />
+
+      
+
+      <div>===动态参数===</div>
     </div>
 
     <script>
@@ -27,6 +38,11 @@
           return {
             message: "hello <span style='color:red'> MY </span> world",
             herf01: "http://baidu.com",
+            number: 5,
+            ok: true,
+            id: 1,
+            attributename: "href",
+            url: "http://baidu.com",
           };
         },
       };

@@ -1,0 +1,120 @@
+server:
+  port: 8008
+
+spring:
+  application:
+    name: heaven-will
+  
+  # Nacos服务发现配置
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: world-story
+        group: DEFAULT_GROUP
+        username: nacos
+        password: nacos
+      config:
+        server-addr: localhost:8848
+        namespace: world-story
+        group: DEFAULT_GROUP
+        file-extension: yaml
+        refresh-enabled: true
+        username: nacos
+        password: nacos
+    
+    # Sentinel配置
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+        port: 8719
+        client-ip: localhost
+    
+  # 数据源配置
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/world_story?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: postgres
+    password: 123456
+  
+  # Redis配置
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 60000
+      password:
+      lettuce:
+        pool:
+          max-active: 100
+          max-idle: 10
+          min-idle: 0
+          max-wait: -1
+
+# MyBatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.hong.heavenwill.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: AUTO
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# SA-Token配置
+sa-token:
+  # token名称
+  token-name: Authorization
+  # token有效期（秒）
+  timeout: 86400
+  # token临时有效期（秒）
+  activity-timeout: -1
+  # 是否允许同一账号多地登录
+  is-concurrent: true
+  # 是否在账号被挤下线时输出日志
+  is-logout-after-concurrent-login: true
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: false
+  # 配置前缀
+  token-prefix: Bearer
+  # token在cookie中的相关属性
+  cookie:
+    # 是否开启cookie写入
+    is-read-cookie: false
+    # 是否开启cookie读取
+    is-write-cookie: false
+    # cookie的作用域
+    cookie-domain: 
+    # cookie的路径
+    cookie-path: /
+    # cookie是否仅在https下有效
+    cookie-secure: false
+  # token在header中的相关属性
+  header:
+    # 是否开启header读取
+    is-read-header: true
+    # 是否开启header写入
+    is-write-header: true
+    # header名称
+    header-name: Authorization
+  # Redis配置
+  redis:
+    # 是否使用Redis存储
+    use-redis: true
+    # Redis连接方式
+    mode: standalone
+    # Redis主机
+    host: localhost
+    # Redis端口
+    port: 6379
+    # Redis密码
+    password: 
+    # Redis数据库
+    database: 0

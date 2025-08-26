@@ -1,0 +1,45 @@
+server:
+  port: 8084
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://xxx.hong.com:5432/user_service
+    username: postgres
+    password: postgres
+  redis:
+    host: xxx.hong.com
+    port: 6379
+    database: 0
+    password: 
+    timeout: 10000
+  cloud:
+    sentinel:
+      transport:
+        dashboard: localhost:8080
+      eager: true
+    openfeign:
+      sentinel:
+        enabled: true
+
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+logging:
+  level:
+    com.hong.user: debug
+
+# 自定义配置
+user:
+  security:
+    # 密码加盐值，用于增强密码安全性
+    salt: "world-story-salt-2024"

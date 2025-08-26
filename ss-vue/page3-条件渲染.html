@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <script src="https://unpkg.com/vue@next"></script> -->
+    <script src="./vue.global.js"></script>
+
+    <!-- <script src="https://unpkg.com/vue-router@4"></script> -->
+    <title>page-3条件渲染</title>
+  </head>
+
+  <body>
+    <div id="app">
+      <div>===条件渲染===</div>
+      <h1 v-if="awsome">Hello Vue 3!</h1>
+      <h1 v-else>你好 Vue 3!</h1>
+      <h1 v-if="defaultkey">Hello java!</h1>
+      <h1 v-else>你好 java!</h1>
+      <div>======</div>
+      <!-- template 仅仅作为一个过渡标签，虚拟的资源内容，不会被网页渲染 -->
+      <template v-if="con1">
+        <h1>条件1成立</h1>
+        <p>这是条件1成立时显示的内容</p>
+      </template>
+
+      <div>======</div>
+      <div v-if="con2 === 'A'">
+        <p>con2 === 'A'</p> 
+      </div>
+      <div v-else-if="con2 === 'B'">
+        <p>else-if 块内容</p>
+        <p>else-if con2 === 'B'</p>
+      </div>
+    </div>
+
+    <script>
+      const App = {
+        data() {
+          return {
+            message: "hello",
+            awsome: true,
+            defaultkey: false,
+            con1: true,
+            con2: "B",
+          };
+        },
+      };
+      Vue.createApp(App).mount("#app");
+    </script>
+  </body>
+</html>

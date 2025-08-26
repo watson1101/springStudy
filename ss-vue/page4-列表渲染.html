@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <script src="https://unpkg.com/vue@next"></script> -->
+    <script src="./vue.global.js"></script>
+
+    <!-- <script src="https://unpkg.com/vue-router@4"></script> -->
+    <title>page-4列表渲染</title>
+  </head>
+  <body>
+    <div id="app">
+        <div>===列表渲染===</div>
+        <span v-for="n in 9" :key="n">{{n}}</span>
+        <div v-for="n in 9" :key="n">{{n}}</div>
+    </div>
+    <script>
+      const App = {
+        data() {
+          return {
+            message: "hello",
+            awsome: true,
+            defaultkey: false,
+            con1: true,
+            con2: "B",
+          };
+        },
+      };
+      Vue.createApp(App).mount("#app");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
+<parent>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-starter-parent</artifactId>
+  <!--<version>2.7.18</version>-->
+  <version>3.3.11</version>
+  <relativePath/> <!-- lookup parent from repository -->
+</parent>
+
+<groupId>com.hong</groupId>
+<artifactId>world-story</artifactId>
+<version>1.0-SNAPSHOT</version>
+<name>Archetype - world-story</name>
+<packaging>pom</packaging>
+<modules>
+        <module>common</module>
+        <module>gateway-service</module>
+        <module>haven-world</module>
+        <module>human-world</module>
+        <module>under-world</module>
+        <module>user</module>
+        <module>role</module>
+        <module>heaven-will</module>
+    </modules>
+
+<properties>
+  <maven.compiler.source>21</maven.compiler.source>
+  <maven.compiler.target>21</maven.compiler.target>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+  <spring-cloud.version>2023.0.1</spring-cloud.version>
+  <spring-cloud-gateway.version>4.2.2</spring-cloud-gateway.version>
+  <spring-cloud-alibab.version>2023.0.1.2</spring-cloud-alibab.version>
+  <spring-cloud-loadbalancer.version>3.1.4</spring-cloud-loadbalancer.version>
+  <spring-cloud-starter-bootstrap.version>4.2.1</spring-cloud-starter-bootstrap.version>
+
+  <spring-boot.version>3.3.11</spring-boot.version>
+  <mysql.version>8.0.33</mysql.version>
+  <mybatis-plus.version>3.5.12</mybatis-plus.version>
+  <nacos-discovery.version>2023.0.3.2</nacos-discovery.version>
+  <nacos-config.version>2023.0.3.2</nacos-config.version>
+  <sentinel.version>2023.0.3.2</sentinel.version>
+  <hutool.version>5.8.37</hutool.version>
+  <postgresql.version>42.7.3</postgresql.version>
+  <fastjson.version>2.0.43</fastjson.version>
+</properties>
+
+<dependencies>
+  <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-dependencies</artifactId>
+    <version>${spring-cloud.version}</version>
+    <type>pom</type>
+    <scope>import</scope>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-gateway</artifactId>
+    <version>${spring-cloud-gateway.version}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+    <version>${spring-cloud-alibab.version}</version>
+    <type>pom</type>
+    <scope>import</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+    <version>${spring-cloud-loadbalancer.version}</version>
+  </dependency>
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter</artifactId>
+    <version>${spring-boot.version}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-autoconfigure</artifactId>
+    <scope>compile</scope>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-jdbc</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-devtools</artifactId>
+    <optional>true</optional>
+  </dependency>
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-test</artifactId>
+    <scope>test</scope>
+  </dependency>
+  <!--redis-->
+  <dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-data-redis</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>com.baomidou</groupId>
+    <!--<artifactId>mybatis-plus-boot-starter</artifactId>-->
+    <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+    <version>${mybatis-plus.version}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.apache.commons</groupId>
+    <artifactId>commons-pool2</artifactId>
+  </dependency>
+
+  <dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <scope>runtime</scope>
+    <version>${postgresql.version}</version>
+  </dependency>
+
+  <dependency>
+    <groupId>org.projectlombok</groupId>
+    <artifactId>lombok</artifactId>
+    <scope>annotationProcessor</scope>
+  </dependency>
+
+  <dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+    <version>${nacos-discovery.version}</version>
+  </dependency>
+  
+  <dependency>
+    <groupId>com.alibaba.cloud</groupId>
+    <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+    <version>${nacos-config.version}</version>
+  </dependency>
+  
+  <dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-bootstrap</artifactId>
+    <version>${spring-cloud-starter-bootstrap.version}</version>
+  </dependency>
+
+  <!-- https://mvnrepository.com/artifact/cn.hutool/hutool-core -->
+  <dependency>
+    <groupId>cn.hutool</groupId>
+    <artifactId>hutool-core</artifactId>
+    <version>${hutool.version}</version>
+  </dependency>
+  <dependency>
+    <groupId>com.alibaba</groupId>
+    <artifactId>fastjson</artifactId>
+    <version>${fastjson.version}</version> <!-- 请根据需要选择版本 -->
+  </dependency>
+</dependencies>
+
+</project>
