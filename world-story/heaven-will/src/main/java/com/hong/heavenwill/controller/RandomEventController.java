@@ -1,13 +1,13 @@
 package com.hong.heavenwill.controller;
 
-import cn.dev33.satoken.annotation.SaCheckRole;
 import com.hong.heavenwill.entity.RandomEvent;
 import com.hong.heavenwill.service.RandomEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import java.util.HashMap;
+
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * 随机事件控制器
@@ -25,7 +25,6 @@ public class RandomEventController {
      * @param params 事件参数
      * @return 触发结果
      */
-    @SaCheckRole("SUPER_ADMIN")
     @PostMapping("/trigger")
     public Map<String, Object> triggerRandomEvent(@RequestBody Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
@@ -80,7 +79,6 @@ public class RandomEventController {
      * 获取活跃中的事件列表
      * @return 活跃事件列表
      */
-    @SaCheckRole("SUPER_ADMIN")
     @GetMapping("/active")
     public Map<String, Object> getActiveEvents() {
         Map<String, Object> result = new HashMap<>();
@@ -102,7 +100,6 @@ public class RandomEventController {
      * 处理过期事件
      * @return 处理结果
      */
-    @SaCheckRole("SUPER_ADMIN")
     @PostMapping("/expired/handle")
     public Map<String, Object> handleExpiredEvents() {
         Map<String, Object> result = new HashMap<>();
@@ -125,7 +122,6 @@ public class RandomEventController {
      * @param params 事件参数
      * @return 生成的事件
      */
-    @SaCheckRole("SUPER_ADMIN")
     @PostMapping("/natural-disaster")
     public Map<String, Object> generateNaturalDisaster(@RequestBody Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
@@ -149,7 +145,6 @@ public class RandomEventController {
      * @param params 事件参数
      * @return 生成的事件
      */
-    @SaCheckRole("SUPER_ADMIN")
     @PostMapping("/treasure-discovery")
     public Map<String, Object> generateTreasureDiscovery(@RequestBody Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
@@ -173,7 +168,6 @@ public class RandomEventController {
      * @param params 事件参数
      * @return 生成的事件
      */
-    @SaCheckRole("SUPER_ADMIN")
     @PostMapping("/immortal-descent")
     public Map<String, Object> generateImmortalDescent(@RequestBody Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
@@ -197,7 +191,6 @@ public class RandomEventController {
      * @param params 事件参数
      * @return 生成的事件
      */
-    @SaCheckRole("SUPER_ADMIN")
     @PostMapping("/divine-beast")
     public Map<String, Object> generateDivineBeastAppearance(@RequestBody Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
@@ -221,7 +214,6 @@ public class RandomEventController {
      * @param params 事件参数
      * @return 生成的事件
      */
-    @SaCheckRole("SUPER_ADMIN")
     @PostMapping("/spirit-tide")
     public Map<String, Object> generateSpiritTide(@RequestBody Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();

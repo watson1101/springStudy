@@ -1,12 +1,9 @@
 package com.hong.user.dto;
 
-import lombok.Data;
-
 /**
  * 登录DTO类
  * 用于接收用户登录请求的参数
  */
-@Data
 public class LoginDTO {
 
     /**
@@ -33,4 +30,44 @@ public class LoginDTO {
      * 验证码ID，可选参数
      */
     private String captchaId;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Boolean getRememberMe() {
+        return rememberMe;
+    }
+
+    public void setRememberMe(Boolean rememberMe) {
+        this.rememberMe = rememberMe;
+    }
+
+    public String getCaptcha() {
+        return captcha;
+    }
+
+    public void setCaptcha(String captcha) {
+        this.captcha = captcha;
+    }
+
+    public String getCaptchaId() {
+        return captchaId;
+    }
+
+    public void setCaptchaId(String captchaId) {
+        this.captchaId = captchaId;
+    }
 }

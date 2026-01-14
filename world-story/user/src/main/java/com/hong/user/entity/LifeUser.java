@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,7 +12,6 @@ import java.time.LocalDateTime;
  * 生命实体类
  * 记录每个真灵的每一世的信息
  */
-@Data
 @TableName("t_user")
 public class LifeUser {
     
@@ -93,4 +91,124 @@ public class LifeUser {
      */
     @TableLogic
     private Integer deleted;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getMetaUserId() {
+        return metaUserId;
+    }
+
+    public void setMetaUserId(Long metaUserId) {
+        this.metaUserId = metaUserId;
+    }
+
+    public Integer getLifeCount() {
+        return lifeCount;
+    }
+
+    public void setLifeCount(Integer lifeCount) {
+        this.lifeCount = lifeCount;
+    }
+
+    public String getWorldType() {
+        return worldType;
+    }
+
+    public void setWorldType(String worldType) {
+        this.worldType = worldType;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getBirthYearCn() {
+        return birthYearCn;
+    }
+
+    public void setBirthYearCn(String birthYearCn) {
+        this.birthYearCn = birthYearCn;
+    }
+
+    public String getBirthMonthCn() {
+        return birthMonthCn;
+    }
+
+    public void setBirthMonthCn(String birthMonthCn) {
+        this.birthMonthCn = birthMonthCn;
+    }
+
+    public String getBirthDayCn() {
+        return birthDayCn;
+    }
+
+    public void setBirthDayCn(String birthDayCn) {
+        this.birthDayCn = birthDayCn;
+    }
+
+    public String getBirthHourCn() {
+        return birthHourCn;
+    }
+
+    public void setBirthHourCn(String birthHourCn) {
+        this.birthHourCn = birthHourCn;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+    public Long getDestinyValue() {
+        return destinyValue;
+    }
+
+    public void setDestinyValue(Long destinyValue) {
+        this.destinyValue = destinyValue;
+    }
+
+    public Long getMisfortuneValue() {
+        return misfortuneValue;
+    }
+
+    public void setMisfortuneValue(Long misfortuneValue) {
+        this.misfortuneValue = misfortuneValue;
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public LocalDateTime getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(LocalDateTime updatedTime) {
+        this.updatedTime = updatedTime;
+    }
+
+    public Integer getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Integer deleted) {
+        this.deleted = deleted;
+    }
 }

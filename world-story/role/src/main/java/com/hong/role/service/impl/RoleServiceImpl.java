@@ -178,7 +178,10 @@ public class RoleServiceImpl extends ServiceImpl<RoleMapper, Role> implements Ro
         }
         
         // 批量插入用户角色关联
-        return userRoleMapper.insertBatchSomeColumn(userRoles) > 0;
+        for (UserRole userRole : userRoles) {
+            userRoleMapper.insert(userRole);
+        }
+        return true;
     }
 
     @Override

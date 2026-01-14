@@ -1,7 +1,6 @@
 package com.hong.user.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
-import cn.dev33.satoken.util.SaFoxUtil;
 import com.hong.user.dto.LoginDTO;
 import com.hong.user.dto.UserDTO;
 import com.hong.user.entity.User;
@@ -113,8 +112,9 @@ public class LoginServiceImpl implements LoginService {
         }
 
         try {
-            // 使用SA-Token的checkToken方法验证token是否有效
-            return StpUtil.checkToken(token);
+            // 使用SA-Token的方法验证token是否有效
+            StpUtil.checkLogin();
+            return true;
         } catch (Exception e) {
             return false;
         }

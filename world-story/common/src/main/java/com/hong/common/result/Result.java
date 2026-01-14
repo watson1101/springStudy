@@ -137,4 +137,13 @@ public class Result<T> implements Serializable {
     public static <T> Result<T> forbidden() {
         return new Result<>(ResultCode.FORBIDDEN.getCode(), ResultCode.FORBIDDEN.getMessage(), null);
     }
+
+    /**
+     * 检查是否成功
+     *
+     * @return 是否成功
+     */
+    public boolean isSuccess() {
+        return this.code.equals(ResultCode.SUCCESS.getCode());
+    }
 }

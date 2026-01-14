@@ -82,9 +82,9 @@ public class ScheduledEventTask {
 
     /**
      * 每3小时生成一次高概率事件
-     * cron表达式：0 0 */3 * * ? 表示每3小时执行一次
+     * cron表达式：0 0 0/3 * * ? 表示每3小时执行一次
      */
-    @Scheduled(cron = "0 0 */3 * * ?")
+    @Scheduled(cron = "0 0 0/3 * * ?")
     public void generateHighProbabilityEvent() {
         System.out.println("开始生成高概率事件：" + LocalDateTime.now());
         

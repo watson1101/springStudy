@@ -249,11 +249,12 @@ public class RandomEventServiceImpl extends ServiceImpl<RandomEventMapper, Rando
     public int handleExpiredEvents() {
         LocalDateTime now = LocalDateTime.now();
         // 查询并更新已过期的事件
-        return this.lambdaUpdate()
+        boolean updated = this.lambdaUpdate()
                 .eq(RandomEvent::getStatus, STATUS_ACTIVE)
                 .lt(RandomEvent::getEndTime, now)
                 .set(RandomEvent::getStatus, STATUS_ENDED)
                 .update();
+        return updated ? 1 : 0;
     }
 
     @Override

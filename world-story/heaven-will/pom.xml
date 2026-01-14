@@ -72,20 +72,6 @@
             <version>${project.version}</version>
         </dependency>
         
-        <!-- SA-Token 登录鉴权框架 -->
-        <dependency>
-            <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-spring-boot3-starter</artifactId>
-            <version>1.37.0</version>
-        </dependency>
-        
-        <!-- SA-Token 整合 Redis -->
-        <dependency>
-            <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-dao-redis-jackson</artifactId>
-            <version>1.37.0</version>
-        </dependency>
-        
         <!-- Hutool工具包 -->
         <dependency>
             <groupId>cn.hutool</groupId>

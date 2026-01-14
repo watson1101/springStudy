@@ -1,14 +1,11 @@
 package com.hong.user.dto;
 
-import lombok.Data;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
  * 生命用户数据传输对象
  */
-@Data
 public class LifeUserDTO {
     
     /**
@@ -80,4 +77,116 @@ public class LifeUserDTO {
      * 更新时间
      */
     private LocalDateTime updatedTime;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getMetaUserId() {
+        return metaUserId;
+    }
+
+    public void setMetaUserId(Long metaUserId) {
+        this.metaUserId = metaUserId;
+    }
+
+    public Integer getLifeCount() {
+        return lifeCount;
+    }
+
+    public void setLifeCount(Integer lifeCount) {
+        this.lifeCount = lifeCount;
+    }
+
+    public String getWorldType() {
+        return worldType;
+    }
+
+    public void setWorldType(String worldType) {
+        this.worldType = worldType;
+    }
+
+    public LocalDate getBirthDate() {
+        return birthDate;
+    }
+
+    public void setBirthDate(LocalDate birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public String getBirthYearCn() {
+        return birthYearCn;
+    }
+
+    public void setBirthYearCn(String birthYearCn) {
+        this.birthYearCn = birthYearCn;
+    }
+
+    public String getBirthMonthCn() {
+        return birthMonthCn;
+    }
+
+    public void setBirthMonthCn(String birthMonthCn) {
+        this.birthMonthCn = birthMonthCn;
+    }
+
+    public String getBirthDayCn() {
+        return birthDayCn;
+    }
+
+    public void setBirthDayCn(String birthDayCn) {
+        this.birthDayCn = birthDayCn;
+    }
+
+    public String getBirthHourCn() {
+        return birthHourCn;
+    }
+
+    public void setBirthHourCn(String birthHourCn) {
+        this.birthHourCn = birthHourCn;
+    }
+
+    public String getSpecies() {
+        return species;
+    }
+
+    public void setSpecies(String species) {
+        this.species = species;
+    }
+
+    public Long getDestinyValue() {
+        return destinyValue;
+    }
+
+    public void setDestinyValue(Long destinyValue) {
+        this.destinyValue = destinyValue;
+    }
+
+    public Long getMisfortuneValue() {
+        return misfortuneValue;
+    }
+
+    public void setMisfortuneValue(Long misfortuneValue) {
+        this.misfortuneValue = misfortuneValue;
+    }
+
+    public LocalDateTime getCreatedTime() {
+        return createdTime;
+    }
+
+    public void setCreatedTime(LocalDateTime createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    public LocalDateTime getUpdatedTime() {
+        return updatedTime;
+    }
+
+    public void setUpdatedTime(LocalDateTime updatedTime) {
+        this.updatedTime = updatedTime;
+    }
 }

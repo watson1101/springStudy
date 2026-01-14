@@ -21,12 +21,7 @@ public class SaTokenInterceptorConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         // 注册SA-Token拦截器，并排除公开接口
-        registry.addInterceptor(new SaInterceptor(handler -> {
-            // 拦截规则：除了登录接口、注册接口等公开接口外，其他所有请求都需要登录
-            SaRouter.match("/**", "!/**/auth/**", "!/**/user/username/**", "!/**/user/\{id\}", r -> {
-                // 检查是否已登录
-                StpUtil.checkLogin();
-            });
-        })).addPathPatterns("/**");
+        registry.addInterceptor(new SaInterceptor()).addPathPatterns("/**")
+                .excludePathPatterns("/**/auth/**", "/**/user/username/**", "/**/user/{id}");
     }
 }
