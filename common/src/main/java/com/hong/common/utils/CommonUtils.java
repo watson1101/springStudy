@@ -1,13 +1,14 @@
 package com.hong.common.utils;
 
+import com.baomidou.mybatisplus.core.toolkit.IdWorker;
+
 public class CommonUtils {
-    public static String getRandomString(int length) {
-        String str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < length; i++) {
-            int index = (int) (Math.random() * str.length());
-            sb.append(str.charAt(index));
-        }
-        return sb.toString();
+
+    /**
+     * 使用雪花算法生成不重复的字符串
+     * @return 不重复的字符串
+     */
+    public static String generateUniqueString() {
+        return String.valueOf(IdWorker.getId());
     }
 }
