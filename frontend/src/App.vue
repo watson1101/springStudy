@@ -4,12 +4,14 @@
       <el-header class="app-header">
         <div class="header-content">
           <div class="logo">
-            <el-icon><User /></el-icon>
-            <span>用户管理系统</span>
+            <el-icon><OfficeBuilding /></el-icon>
+            <span>企业管理系统</span>
           </div>
           <div class="header-actions">
             <router-link to="/" class="nav-item">首页</router-link>
             <router-link to="/user" class="nav-item">用户管理</router-link>
+            <router-link to="/goods" class="nav-item">商品管理</router-link>
+            <router-link to="/order" class="nav-item">订单管理</router-link>
           </div>
         </div>
       </el-header>
@@ -24,7 +26,7 @@
 </template>
 
 <script setup>
-import { User } from '@element-plus/icons-vue'
+import { User, OfficeBuilding } from '@element-plus/icons-vue'
 </script>
 
 <style scoped>
