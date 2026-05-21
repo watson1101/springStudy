@@ -1,0 +1,101 @@
+<!--settings.wxml-->
+<view class="container">
+  <view class="settings-card">
+    <!-- AI配置 -->
+    <view class="setting-section">
+      <view class="section-header">
+        <text class="section-title">🤖 AI配置</text>
+        <text class="section-desc">配置后可智能识别提醒时间</text>
+      </view>
+
+      <!-- AI提供商选择 -->
+      <view class="setting-item">
+        <text class="item-label">AI提供商</text>
+        <picker
+          mode="selector"
+          range="{{providers}}"
+          range-key="label"
+          value="{{providerIndex}}"
+          bindchange="onProviderChange"
+        >
+          <view class="picker-value">
+            {{providers[providerIndex].label}}
+            <text class="arrow">›</text>
+          </view>
+        </picker>
+      </view>
+
+      <!-- API密钥输入 -->
+      <view class="setting-item">
+        <text class="item-label">API密钥</text>
+        <input
+          class="api-input"
+          value="{{apiKey}}"
+          placeholder="请输入API密钥"
+          bindinput="onApiKeyInput"
+          password="{{!showApiKey}}"
+        />
+        <text class="toggle-btn" bindtap="toggleApiKey">
+          {{showApiKey ? '隐藏' : '显示'}}
+        </text>
+      </view>
+
+      <!-- API密钥获取说明 -->
+      <view class="api-help" wx:if="{{!apiKey}}">
+        <text class="help-title">如何获取API密钥：</text>
+        <view class="help-item">
+          <text class="help-provider">Kimi (月之暗面)</text>
+          <text class="help-url">platform.moonshot.cn</text>
+        </view>
+        <view class="help-item">
+          <text class="help-provider">DeepSeek</text>
+          <text class="help-url">platform.deepseek.com</text>
+        </view>
+        <view class="help-item">
+          <text class="help-provider">智谱GLM</text>
+          <text class="help-url">open.bigmodel.cn</text>
+        </view>
+      </view>
+
+      <!-- 测试连接按钮 -->
+      <button class="test-btn" bindtap="testConnection" disabled="{{!apiKey}}">
+        {{testing ? '测试中...' : '测试连接'}}
+      </button>
+    </view>
+
+    <!-- 订阅消息配置 -->
+    <view class="setting-section">
+      <view class="section-header">
+        <text class="section-title">🔔 订阅消息</text>
+        <text class="section-desc">配置后可收到微信消息提醒</text>
+      </view>
+
+      <view class="setting-item">
+        <text class="item-label">模板ID</text>
+        <input
+          class="api-input"
+          value="{{templateId}}"
+          placeholder="请输入订阅消息模板ID"
+          bindinput="onTemplateIdInput"
+        />
+      </view>
+
+      <view class="template-help">
+        <text class="help-title">如何配置订阅消息：</text>
+        <text class="help-text">1. 登录微信公众平台</text>
+        <text class="help-text">2. 进入"功能" -> "订阅消息"</text>
+        <text class="help-text">3. 选择或创建消息模板</text>
+        <text class="help-text">4. 复制模板ID到此处</text>
+      </view>
+    </view>
+
+    <!-- 保存按钮 -->
+    <button class="save-btn" bindtap="saveSettings">保存配置</button>
+  </view>
+
+  <!-- 关于信息 -->
+  <view class="about-section">
+    <text class="about-text">智能备忘 v1.0.0</text>
+    <text class="about-text">使用AI技术智能识别提醒时间</text>
+  </view>
+</view>

@@ -1,0 +1,188 @@
+/* settings.wxss */
+.container {
+  min-height: 100vh;
+  background-color: #f5f5f5;
+  padding: 24rpx;
+}
+
+.settings-card {
+  background: white;
+  border-radius: 16rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 12rpx rgba(0, 0, 0, 0.08);
+}
+
+/* 配置区域 */
+.setting-section {
+  padding: 32rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.section-header {
+  margin-bottom: 24rpx;
+}
+
+.section-title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.section-desc {
+  font-size: 26rpx;
+  color: #999;
+  display: block;
+}
+
+/* 配置项 */
+.setting-item {
+  display: flex;
+  align-items: center;
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #f5f5f5;
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.item-label {
+  font-size: 28rpx;
+  color: #666;
+  width: 180rpx;
+  flex-shrink: 0;
+}
+
+.picker-value {
+  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.arrow {
+  font-size: 40rpx;
+  color: #999;
+  transform: rotate(90deg);
+}
+
+.api-input {
+  flex: 1;
+  font-size: 28rpx;
+  color: #333;
+  padding: 16rpx;
+  background: #f5f5f5;
+  border-radius: 8rpx;
+}
+
+.toggle-btn {
+  font-size: 24rpx;
+  color: #1890ff;
+  margin-left: 16rpx;
+  padding: 8rpx 16rpx;
+}
+
+/* API帮助信息 */
+.api-help {
+  margin: 24rpx 0;
+  padding: 24rpx;
+  background: #f0f9ff;
+  border-radius: 12rpx;
+  border-left: 4rpx solid #1890ff;
+}
+
+.help-title {
+  font-size: 26rpx;
+  color: #0050b3;
+  font-weight: 600;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.help-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.help-provider {
+  font-size: 26rpx;
+  color: #333;
+}
+
+.help-url {
+  font-size: 24rpx;
+  color: #1890ff;
+}
+
+/* 模板帮助信息 */
+.template-help {
+  margin: 24rpx 0;
+  padding: 24rpx;
+  background: #fff7e6;
+  border-radius: 12rpx;
+  border-left: 4rpx solid #fa8c16;
+}
+
+.help-text {
+  font-size: 26rpx;
+  color: #ad6800;
+  display: block;
+  margin-bottom: 8rpx;
+  line-height: 1.6;
+}
+
+/* 按钮 */
+.test-btn {
+  margin-top: 24rpx;
+  background: #f0f9ff;
+  color: #1890ff;
+  border: 1rpx solid #bae7ff;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  font-size: 28rpx;
+}
+
+.test-btn::after {
+  border: none;
+}
+
+.test-btn[disabled] {
+  background: #f5f5f5;
+  color: #d9d9d9;
+  border-color: #d9d9d9;
+}
+
+.save-btn {
+  margin: 32rpx;
+  background: linear-gradient(135deg, #1890ff 0%, #096dd9 100%);
+  color: white;
+  border: none;
+  border-radius: 12rpx;
+  padding: 28rpx;
+  font-size: 32rpx;
+  font-weight: 600;
+}
+
+.save-btn::after {
+  border: none;
+}
+
+/* 关于信息 */
+.about-section {
+  margin-top: 48rpx;
+  text-align: center;
+  padding: 32rpx;
+}
+
+.about-text {
+  font-size: 26rpx;
+  color: #999;
+  display: block;
+  margin-bottom: 8rpx;
+}

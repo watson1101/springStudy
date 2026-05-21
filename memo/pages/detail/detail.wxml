@@ -1,0 +1,91 @@
+<!--detail.wxml-->
+<view class="container">
+  <view class="detail-card">
+    <!-- 标题 -->
+    <view class="title-section">
+      <input
+        class="title-input"
+        value="{{memo.title}}"
+        bindinput="onTitleChange"
+        placeholder="输入标题"
+        maxlength="50"
+      />
+    </view>
+
+    <!-- 内容 -->
+    <view class="content-section">
+      <textarea
+        class="content-input"
+        value="{{memo.content}}"
+        bindinput="onContentChange"
+        placeholder="输入内容"
+        auto-height
+        maxlength="1000"
+      />
+    </view>
+
+    <!-- 图片 -->
+    <view class="images-section" wx:if="{{memo.images && memo.images.length > 0}}">
+      <view class="image-item" wx:for="{{memo.images}}" wx:key="index">
+        <image src="{{item}}" mode="aspectFill" class="memo-image" bindtap="previewImage" data-url="{{item}}" />
+      </view>
+    </view>
+
+    <!-- 提醒设置 -->
+    <view class="remind-section">
+      <view class="section-header">
+        <text class="section-title">⏰ 提醒设置</text>
+        <switch checked="{{hasRemind}}" bindchange="onRemindSwitch" />
+      </view>
+
+      <view class="remind-time-picker" wx:if="{{hasRemind}}">
+        <picker
+          mode="multiSelector"
+          range="{{timeRange}}"
+          range-key="{{timeRangeKey}}"
+          value="{{timeSelectorValue}}"
+          bindchange="onTimeChange"
+        >
+          <view class="picker-display">
+            <text>{{selectedTimeStr || '选择提醒时间'}}</text>
+          </view>
+        </picker>
+
+        <view class="quick-select">
+          <button class="quick-btn" bindtap="quickSelect" data-minutes="30">30分钟后</button>
+          <button class="quick-btn" bindtap="quickSelect" data-minutes="60">1小时后</button>
+          <button class="quick-btn" bindtap="quickSelect" data-type="tomorrow">明天9点</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- AI分析结果 -->
+    <view class="ai-section" wx:if="{{memo.aiAnalysis}}">
+      <view class="section-header">
+        <text class="section-title">✨ AI分析</text>
+      </view>
+      <view class="ai-result">
+        <text class="ai-item">分类：{{memo.aiAnalysis.category || '其他'}}</text>
+        <text class="ai-item" wx:if="{{memo.aiAnalysis.summary}}">摘要：{{memo.aiAnalysis.summary}}</text>
+      </view>
+    </view>
+
+    <!-- 创建时间 -->
+    <view class="meta-section">
+      <text class="meta-text">创建于 {{memo.createTimeStr}}</text>
+      <text class="meta-text" wx:if="{{memo.remindTimeStr}}">提醒时间 {{memo.remindTimeStr}}</text>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-buttons">
+    <button class="action-btn delete-btn" bindtap="deleteMemo">删除</button>
+    <button class="action-btn save-btn" bindtap="saveMemo">保存</button>
+  </view>
+
+  <!-- 订阅消息按钮 -->
+  <view class="subscribe-section" wx:if="{{memo.remindTime && !memo.subscribed}}">
+    <button class="subscribe-btn" bindtap="subscribeMessage">开启消息提醒</button>
+    <text class="subscribe-tip">开启后将在提醒时间收到微信通知</text>
+  </view>
+</view>

@@ -1,0 +1,96 @@
+<!--index.wxml-->
+<view class="container">
+  <!-- 顶部输入区域 -->
+  <view class="input-section">
+    <view class="input-box" bindtap="focusInput">
+      <textarea
+        class="memo-input"
+        placeholder="输入备忘内容，支持智能识别提醒时间..."
+        value="{{inputText}}"
+        bindinput="onInputChange"
+        auto-height
+        maxlength="500"
+        show-confirm-bar="{{false}}"
+      />
+      <view class="input-actions">
+        <view class="action-left">
+          <button class="icon-btn" bindtap="chooseImage" hover-class="btn-hover">
+            <text class="iconfont">📷</text>
+            <text wx:if="{{images.length > 0}}">{{images.length}}</text>
+          </button>
+        </view>
+        <view class="action-right">
+          <button class="send-btn" bindtap="saveMemo" disabled="{{!inputText && images.length === 0}}">
+            {{analyzing ? '分析中...' : '保存'}}
+          </button>
+        </view>
+      </view>
+      <!-- 图片预览 -->
+      <view class="image-preview" wx:if="{{images.length > 0}}">
+        <view class="preview-item" wx:for="{{images}}" wx:key="index">
+          <image src="{{item}}" mode="aspectFill" class="preview-image" />
+          <view class="remove-btn" catchtap="removeImage" data-index="{{index}}">×</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- AI提示 -->
+    <view class="ai-tip" wx:if="{{showAiTip}}">
+      <text class="tip-icon">✨</text>
+      <text class="tip-text">{{aiTipText}}</text>
+    </view>
+  </view>
+
+  <!-- 备忘列表 -->
+  <view class="memo-list">
+    <view class="list-header">
+      <text class="header-title">我的备忘</text>
+      <text class="header-count">({{memos.length}})</text>
+    </view>
+
+    <view wx:if="{{memos.length === 0}}" class="empty-state">
+      <text class="empty-icon">📝</text>
+      <text class="empty-text">暂无备忘，开始添加第一条吧</text>
+    </view>
+
+    <view
+      class="memo-item {{item.remindTime && currentTime >= item.remindTime && !item.notified ? 'reminded' : ''}} {{item.remindTime && currentTime < item.remindTime ? 'pending' : ''}}"
+      wx:for="{{memos}}"
+      wx:key="id"
+      bindtap="goToDetail"
+      data-memo="{{item}}"
+    >
+      <view class="memo-header">
+        <text class="memo-title">{{item.title || '无标题'}}</text>
+        <view class="memo-badge" wx:if="{{item.remindTime && currentTime < item.remindTime}}">
+          <text class="badge-dot"></text>
+        </view>
+      </view>
+
+      <text class="memo-content">{{item.content}}</text>
+
+      <view class="memo-images" wx:if="{{item.images && item.images.length > 0}}">
+        <image
+          src="{{img}}"
+          mode="aspectFill"
+          class="memo-image"
+          wx:for="{{item.images}}"
+          wx:for-item="img"
+          wx:for-index="idx"
+          wx:key="idx"
+        />
+      </view>
+
+      <view class="memo-footer">
+        <view class="remind-info" wx:if="{{item.remindTime}}">
+          <text class="remind-icon">⏰</text>
+          <text class="remind-text">{{item.remindTimeStr}}</text>
+          <text class="remind-status" wx:if="{{currentTime >= item.remindTime}}">
+            {{item.notified ? '已提醒' : '待提醒'}}
+          </text>
+        </view>
+        <text class="memo-time">{{item.createTimeStr}}</text>
+      </view>
+    </view>
+  </view>
+</view>
