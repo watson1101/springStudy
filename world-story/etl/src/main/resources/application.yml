@@ -1,10 +1,10 @@
 server:
-  port: 8008
+  port: 8010
 
 spring:
   application:
-    name: heaven-will
-  
+    name: etl
+
   # Nacos服务发现配置
   cloud:
     nacos:
@@ -22,34 +22,6 @@ spring:
         refresh-enabled: true
         username: nacos
         password: nacos
-    
-    # Sentinel配置
-    sentinel:
-      transport:
-        dashboard: localhost:8080
-        port: 8719
-        client-ip: localhost
-    
-  # 数据源配置
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/world_story?useUnicode=true&characterEncoding=utf8&useSSL=false
-    username: postgres
-    password: 123456
-
-# MyBatis-Plus配置
-mybatis-plus:
-  mapper-locations: classpath*:/mapper/**/*.xml
-  type-aliases-package: com.hong.heavenwill.entity
-  configuration:
-    map-underscore-to-camel-case: true
-    cache-enabled: false
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  global-config:
-    db-config:
-      id-type: AUTO
-      logic-delete-value: 1
-      logic-not-delete-value: 0
 
 # ETL配置
 etl:
@@ -79,3 +51,13 @@ etl:
           primaryKey: id
           columns: id,name,email,created_at
           filter: ""
+
+# Actuator配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always

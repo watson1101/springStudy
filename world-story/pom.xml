@@ -25,6 +25,7 @@
         <module>user</module>
         <module>role</module>
         <module>heaven-will</module>
+        <module>etl</module>
     </modules>
 
 <properties>
