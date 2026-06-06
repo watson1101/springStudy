@@ -22,6 +22,7 @@ public class EtlSyncService {
 
     /**
      * 创建并启动全量同步任务
+     * 注意：当前版本使用CDC增量同步，会自动包含初始全量快照
      */
     public SyncTaskStatus startFullSync(SyncTaskConfig config) {
         try {
@@ -29,10 +30,11 @@ public class EtlSyncService {
             config.setId(taskId);
 
             CdcSyncJob job = new CdcSyncJob(config);
-            job.startFullSync();
+            // CDC增量同步会自动包含初始全量快照
+            job.startIncrementalSync();
 
             runningJobs.put(taskId, job);
-            LOG.info("Full sync task started: {}", taskId);
+            LOG.info("Full sync task started (via CDC): {}", taskId);
 
             return job.getTaskStatus();
         } catch (Exception e) {
@@ -74,6 +76,7 @@ public class EtlSyncService {
 
     /**
      * 创建并启动全量+增量同步任务
+     * 注意：当前版本使用CDC增量同步，会自动包含初始全量快照和后续增量更新
      */
     public SyncTaskStatus startFullAndIncrementalSync(SyncTaskConfig config) {
         try {
@@ -81,11 +84,11 @@ public class EtlSyncService {
             config.setId(taskId);
 
             CdcSyncJob job = new CdcSyncJob(config);
-            job.startFullSync();
+            // CDC增量同步会自动包含初始全量快照和后续增量更新
             job.startIncrementalSync();
 
             runningJobs.put(taskId, job);
-            LOG.info("Full and incremental sync task started: {}", taskId);
+            LOG.info("Full and incremental sync task started (via CDC): {}", taskId);
 
             return job.getTaskStatus();
         } catch (Exception e) {

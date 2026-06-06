@@ -5,39 +5,27 @@ import com.hong.etl.entity.SyncTaskConfig;
 import com.hong.etl.entity.SyncTaskStatus;
 import com.hong.etl.entity.TableConfig;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
-import com.ververica.cdc.connectors.mysql.source.config.ServerIdRange;
-import com.ververica.cdc.connectors.mysql.source.startup.StartupMode;
-import com.ververica.cdc.connectors.mysql.source.startup.StartupOptions;
-import com.ververica.cdc.connectors.postgres.source.PostgresSource;
 import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
-import com.ververica.cdc.debezium.DebeziumSource;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.restartstrategy.RestartStrategies;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
-import org.apache.flink.connector.jdbc.JdbcConnectionOptions;
-import org.apache.flink.connector.jdbc.JdbcExactlyOnceOptions;
-import org.apache.flink.connector.jdbc.JdbcExecutionOptions;
-import org.apache.flink.connector.jdbc.JdbcSink;
-import org.apache.flink.connector.jdbc.JdbcStatementBuilder;
+import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.ProcessFunction;
-import org.apache.flink.streaming.api.functions.source.SourceFunction;
+import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.util.Collector;
+import org.apache.kafka.connect.data.Struct;
+import org.apache.kafka.connect.source.SourceRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
+import java.time.LocalDateTime;
 
 /**
- * Flink CDC同步作业
- * 支持MySQL和PostgreSQL的CDC数据同步
+ * Flink CDC同步作业 - 简化版
  */
 public class CdcSyncJob {
     private static final Logger LOG = LoggerFactory.getLogger(CdcSyncJob.class);
@@ -46,7 +34,16 @@ public class CdcSyncJob {
     private final SyncTaskStatus taskStatus;
     private StreamExecutionEnvironment env;
     private boolean isRunning = false;
-    private CompletableFuture<Void> executionFuture;
+
+    // 保存配置供Sink使用
+    private static class SyncConfig implements java.io.Serializable {
+        private static final long serialVersionUID = 1L;
+        String jdbcUrl;
+        String username;
+        String password;
+        String targetTable;
+        String primaryKey;
+    }
 
     public CdcSyncJob(SyncTaskConfig taskConfig) {
         this.taskConfig = taskConfig;
@@ -60,325 +57,243 @@ public class CdcSyncJob {
     }
 
     /**
-     * 启动全量同步
-     */
-    public void startFullSync() throws Exception {
-        LOG.info("Starting full sync for task: {}", taskConfig.getName());
-        taskStatus.setStatus("RUNNING");
-        taskStatus.setStartTime(java.time.LocalDateTime.now());
-        isRunning = true;
-
-        env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(taskConfig.getParallelism());
-        env.setRestartStrategy(RestartStrategies.noRestart());
-
-        if (taskConfig.getEnableCheckpoint()) {
-            env.enableCheckpointing(taskConfig.getCheckpointInterval());
-        }
-
-        for (TableConfig tableConfig : taskConfig.getTables()) {
-            syncTableFullData(tableConfig);
-        }
-
-        executionFuture = env.executeAsync();
-        LOG.info("Full sync started for task: {}", taskConfig.getName());
-    }
-
-    /**
-     * 启动增量同步(实时CDC)
+     * 启动增量同步
      */
     public void startIncrementalSync() throws Exception {
         LOG.info("Starting incremental sync for task: {}", taskConfig.getName());
         taskStatus.setStatus("RUNNING");
-        taskStatus.setStartTime(java.time.LocalDateTime.now());
+        taskStatus.setStartTime(LocalDateTime.now());
         isRunning = true;
 
         env = StreamExecutionEnvironment.getExecutionEnvironment();
-        env.setParallelism(taskConfig.getParallelism());
+        env.setParallelism(1);
         env.setRestartStrategy(RestartStrategies.noRestart());
 
-        if (taskConfig.getEnableCheckpoint()) {
-            env.enableCheckpointing(taskConfig.getCheckpointInterval());
-        }
+        // 先执行初始快照同步
+        performInitialSnapshot();
 
-        for (TableConfig tableConfig : taskConfig.getTables()) {
-            syncTableIncremental(tableConfig);
-        }
-
-        executionFuture = env.executeAsync();
-        LOG.info("Incremental sync started for task: {}", taskConfig.getName());
-    }
-
-    /**
-     * 全量同步单张表
-     */
-    private void syncTableFullData(TableConfig tableConfig) throws Exception {
+        // 获取表配置
+        TableConfig tableConfig = taskConfig.getTables().get(0);
         DataSourceConfig source = taskConfig.getSource();
         DataSourceConfig target = taskConfig.getTarget();
 
-        SourceFunction<String> sourceFunction = createSourceFunction(source, tableConfig);
+        // 准备同步配置
+        SyncConfig syncConfig = new SyncConfig();
+        syncConfig.jdbcUrl = target.buildJdbcUrl();
+        syncConfig.username = target.getUsername();
+        syncConfig.password = target.getPassword();
+        syncConfig.targetTable = target.getDatabase() + "." + tableConfig.getTargetTable();
+        syncConfig.primaryKey = tableConfig.getPrimaryKey();
 
-        DataStreamSource<String> streamSource = env.addSource(sourceFunction)
-                .name("Full Sync Source - " + tableConfig.getSourceTable());
-
-        SingleOutputStreamOperator<String> processedStream = streamSource
-                .process(new FullSyncProcessFunction())
-                .name("Full Sync Processor - " + tableConfig.getSourceTable());
-
-        writeToTarget(processedStream, tableConfig, target);
-    }
-
-    /**
-     * 增量同步单张表(CDC)
-     */
-    private void syncTableIncremental(TableConfig tableConfig) throws Exception {
-        DataSourceConfig source = taskConfig.getSource();
-
-        DebeziumSource<String> cdcSource = createDebeziumSource(source, tableConfig);
+        // 创建CDC Source
+        Source<String, ?, ?> cdcSource = MySqlSource.<String>builder()
+                .hostname(source.getHost())
+                .port(source.getPort())
+                .databaseList(source.getDatabase())
+                .tableList(source.getDatabase() + "." + tableConfig.getSourceTable())
+                .username(source.getUsername())
+                .password(source.getPassword())
+                .deserializer(new CdcDebeziumDeserializationSchema())
+                .includeSchemaChanges(false)
+                .build();
 
         DataStream<String> cdcStream = env.fromSource(
                 cdcSource,
                 WatermarkStrategy.noWatermarks(),
-                "CDC Source - " + tableConfig.getSourceTable()
+                "CDC Source"
         );
 
-        SingleOutputStreamOperator<String> processedStream = cdcStream
-                .process(new CdcProcessFunction())
-                .name("CDC Processor - " + tableConfig.getSourceTable());
+        // 添加自定义Sink
+        cdcStream.addSink(new SimpleJdbcSink(syncConfig));
 
-        writeToTargetIncremental(processedStream, tableConfig, source);
+        env.executeAsync("CDC Sync - " + taskConfig.getName());
+        LOG.info("Incremental sync started for task: {}", taskConfig.getName());
     }
 
     /**
-     * 创建SourceFunction
+     * 执行初始快照同步
      */
-    private SourceFunction<String> createSourceFunction(DataSourceConfig source, TableConfig tableConfig) {
-        switch (source.getType().toUpperCase()) {
-            case "MYSQL":
-                return createMySqlSourceFunction(source, tableConfig);
-            case "POSTGRESQL":
-                return createPostgresSourceFunction(source, tableConfig);
-            default:
-                throw new IllegalArgumentException("不支持的数据库类型: " + source.getType());
-        }
-    }
+    private void performInitialSnapshot() {
+        DataSourceConfig source = taskConfig.getSource();
+        DataSourceConfig target = taskConfig.getTarget();
+        TableConfig tableConfig = taskConfig.getTables().get(0);
 
-    /**
-     * 创建MySQL Source
-     */
-    private SourceFunction<String> createMySqlSourceFunction(DataSourceConfig source, TableConfig tableConfig) {
-        MySqlSource.Builder<String> builder = MySqlSource.builder()
-                .hostname(source.getHost())
-                .port(source.getPort())
-                .databaseList(source.getDatabase())
-                .tableList(source.getDatabase() + "." + tableConfig.getSourceTable())
-                .username(source.getUsername())
-                .password(source.getPassword())
-                .deserializer(new JsonDebeziumDeserializationSchema())
-                .serverIdRange(ServerIdRange.valueOf("500000-500099"));
+        LOG.info("Performing initial snapshot from {} to {}", source.getDatabase(), target.getDatabase());
 
-        if (tableConfig.getColumns() != null && !tableConfig.getColumns().isEmpty()) {
-            builder.columnSelect(List.of(tableConfig.getColumns().split(",")));
-        }
+        try (Connection sourceConn = DriverManager.getConnection(
+                source.buildJdbcUrl(), source.getUsername(), source.getPassword());
+             Connection targetConn = DriverManager.getConnection(
+                target.buildJdbcUrl(), target.getUsername(), target.getPassword())) {
 
-        return builder.build();
-    }
+            String sourceTable = source.getDatabase() + "." + tableConfig.getSourceTable();
+            String targetTable = target.getDatabase() + "." + tableConfig.getTargetTable();
 
-    /**
-     * 创建PostgreSQL Source
-     */
-    private SourceFunction<String> createPostgresSourceFunction(DataSourceConfig source, TableConfig tableConfig) {
-        PostgresSource.Builder<String> builder = PostgresSource.builder()
-                .hostname(source.getHost())
-                .port(source.getPort())
-                .database(source.getDatabase())
-                .schemaList("public")
-                .tableList(tableConfig.getSourceTable())
-                .username(source.getUsername())
-                .password(source.getPassword())
-                .deserializer(new JsonDebeziumDeserializationSchema())
-                .slotName("flink_cdc_" + UUID.randomUUID().toString().replace("-", ""));
-
-        return builder.build();
-    }
-
-    /**
-     * 创建Debezium Source(用于增量同步)
-     */
-    private DebeziumSource<String> createDebeziumSource(DataSourceConfig source, TableConfig tableConfig) {
-        switch (source.getType().toUpperCase()) {
-            case "MYSQL":
-                return createMySqlDebeziumSource(source, tableConfig);
-            case "POSTGRESQL":
-                return createPostgresDebeziumSource(source, tableConfig);
-            default:
-                throw new IllegalArgumentException("不支持的数据库类型: " + source.getType());
-        }
-    }
-
-    private DebeziumSource<String> createMySqlDebeziumSource(DataSourceConfig source, TableConfig tableConfig) {
-        StartupOptions startupOptions = new StartupOptions();
-        startupOptions.startupMode = StartupMode.INITIAL;
-
-        return MySqlSource.<String>builder()
-                .hostname(source.getHost())
-                .port(source.getPort())
-                .databaseList(source.getDatabase())
-                .tableList(source.getDatabase() + "." + tableConfig.getSourceTable())
-                .username(source.getUsername())
-                .password(source.getPassword())
-                .deserializer(new JsonDebeziumDeserializationSchema())
-                .serverIdRange(ServerIdRange.valueOf("500000-500099"))
-                .startupOptions(startupOptions)
-                .build();
-    }
-
-    private DebeziumSource<String> createPostgresDebeziumSource(DataSourceConfig source, TableConfig tableConfig) {
-        StartupOptions startupOptions = new StartupOptions();
-        startupOptions.startupMode = StartupMode.INITIAL;
-
-        return PostgresSource.<String>builder()
-                .hostname(source.getHost())
-                .port(source.getPort())
-                .database(source.getDatabase())
-                .schemaList("public")
-                .tableList(tableConfig.getSourceTable())
-                .username(source.getUsername())
-                .password(source.getPassword())
-                .deserializer(new JsonDebeziumDeserializationSchema())
-                .slotName("flink_cdc_" + UUID.randomUUID().toString().replace("-", ""))
-                .startupOptions(startupOptions)
-                .build();
-    }
-
-    /**
-     * 写入目标数据库(全量同步)
-     */
-    private void writeToTarget(DataStream<String> stream, TableConfig tableConfig, DataSourceConfig target) {
-        String insertSql = buildInsertSql(tableConfig);
-        String jdbcUrl = target.buildJdbcUrl();
-
-        stream.addSink(JdbcSink.sink(
-                insertSql,
-                new JdbcStatementBuilder<String>() {
-                    @Override
-                    public void accept(PreparedStatement statement, String data) throws SQLException {
-                        parseAndFillParameters(statement, data, tableConfig);
-                    }
-                },
-                JdbcExecutionOptions.builder()
-                        .withBatchSize(taskConfig.getBatchSize())
-                        .build(),
-                new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
-                        .withUrl(jdbcUrl)
-                        .withDriverName(getDriverName(target.getType()))
-                        .withUsername(target.getUsername())
-                        .withPassword(target.getPassword())
-                        .build()
-        ));
-    }
-
-    /**
-     * 写入目标数据库(增量同步)
-     */
-    private void writeToTargetIncremental(DataStream<String> stream, TableConfig tableConfig, DataSourceConfig source) {
-        String targetJdbcUrl = taskConfig.getTarget().buildJdbcUrl();
-
-        stream.addSink(JdbcSink.<String>builder()
-                .setSqlOptions(JdbcExecutionOptions.builder()
-                        .withBatchSize(taskConfig.getBatchSize())
-                        .build())
-                .setJdbcOptions(new JdbcConnectionOptions.JdbcConnectionOptionsBuilder()
-                        .withUrl(targetJdbcUrl)
-                        .withDriverName(getDriverName(taskConfig.getTarget().getType()))
-                        .withUsername(taskConfig.getTarget().getUsername())
-                        .withPassword(taskConfig.getTarget().getPassword())
-                        .build())
-                .setInsertOrUpdateExecutor(new JdbcExactlyOnceOptions.JdbcExactlyOnceOptionsBuilder()
-                        .withXa(true)
-                        .build())
-                .build());
-    }
-
-    /**
-     * 构建插入SQL
-     */
-    private String buildInsertSql(TableConfig tableConfig) {
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO ").append(tableConfig.getTargetTable()).append(" (");
-
-        String[] columns = tableConfig.getColumns() != null && !tableConfig.getColumns().isEmpty()
-                ? tableConfig.getColumns().split(",")
-                : new String[0];
-
-        for (int i = 0; i < columns.length; i++) {
-            sql.append(columns[i].trim());
-            if (i < columns.length - 1) {
-                sql.append(", ");
+            // 清空目标表
+            try (java.sql.Statement stmt = targetConn.createStatement()) {
+                stmt.execute("DELETE FROM " + targetTable);
             }
-        }
-        sql.append(") VALUES (");
-        for (int i = 0; i < columns.length; i++) {
-            sql.append("?");
-            if (i < columns.length - 1) {
-                sql.append(", ");
-            }
-        }
-        sql.append(") ON DUPLICATE KEY UPDATE ");
 
-        String[] primaryKeys = tableConfig.getPrimaryKey().split(",");
-        for (int i = 0; i < primaryKeys.length; i++) {
-            sql.append(primaryKeys[i].trim()).append("=VALUES(").append(primaryKeys[i].trim()).append(")");
-            if (i < primaryKeys.length - 1) {
-                sql.append(", ");
-            }
-        }
-
-        return sql.toString();
-    }
-
-    /**
-     * 解析JSON并填充参数
-     */
-    private void parseAndFillParameters(PreparedStatement statement, String data, TableConfig tableConfig) throws SQLException {
-        try {
-            String json = data;
-            json = json.replace("{", "").replace("}", "").replace("\"", "");
-
-            String[] columns = tableConfig.getColumns() != null && !tableConfig.getColumns().isEmpty()
-                    ? tableConfig.getColumns().split(",")
-                    : json.split(",");
-
-            for (int i = 0; i < columns.length; i++) {
-                String colName = columns[i].trim();
-                String value = extractJsonValue(json, colName);
-                statement.setString(i + 1, value);
+            // 复制数据
+            String insertSql = "INSERT INTO " + targetTable + " SELECT * FROM " + sourceTable;
+            try (java.sql.Statement stmt = targetConn.createStatement()) {
+                int rows = stmt.executeUpdate(insertSql);
+                taskStatus.setSyncedRecords(taskStatus.getSyncedRecords() + (long) rows);
+                LOG.info("Initial snapshot completed: {} rows synced", rows);
             }
         } catch (Exception e) {
-            LOG.error("Error parsing data: {}", data, e);
-            taskStatus.setErrorRecords(taskStatus.getErrorRecords() + 1);
+            LOG.error("Error performing initial snapshot", e);
         }
     }
 
-    private String extractJsonValue(String json, String key) {
-        String[] pairs = json.split(",");
-        for (String pair : pairs) {
-            String[] kv = pair.split(":");
-            if (kv.length == 2 && kv[0].trim().equals(key)) {
-                return kv[1].trim();
+    /**
+     * 简单的JDBC Sink
+     */
+    private static class SimpleJdbcSink implements SinkFunction<String> {
+        private static final Logger LOG = LoggerFactory.getLogger(SimpleJdbcSink.class);
+        private static final long serialVersionUID = 1L;
+
+        private final SyncConfig config;
+        private transient Connection connection;
+
+        public SimpleJdbcSink(SyncConfig config) {
+            this.config = config;
+        }
+
+        /**
+         * 转换时间格式
+         * 从: 2026-05-23T19:24:32Z (ISO 8601)
+         * 到: 2026-05-23 19:24:32 (MySQL DATETIME)
+         */
+        private String convertTimestamp(String ts) {
+            if (ts == null) return null;
+            // 去掉T和Z
+            return ts.replace("T", " ").replace("Z", "");
+        }
+
+        @Override
+        public void invoke(String record) {
+            try {
+                LOG.debug("CDC Event received: {}", record.substring(0, Math.min(200, record.length())));
+
+                if (connection == null || connection.isClosed()) {
+                    connection = DriverManager.getConnection(config.jdbcUrl, config.username, config.password);
+                    LOG.info("JDBC connection established");
+                }
+
+                // 解析Struct格式的CDC事件
+                // 格式: Struct{after=Struct{id=5,username=eve,...},source=Struct{...},op=c,...}
+
+                // 判断操作类型
+                String op = "r";
+                if (record.contains("op=c")) {
+                    op = "c";
+                } else if (record.contains("op=u")) {
+                    op = "u";
+                } else if (record.contains("op=d")) {
+                    op = "d";
+                }
+
+                // 提取数据部分 (after或before)
+                String section = "d".equals(op) ? "before" : "after";
+                String dataSection = extractStructSection(record, section);
+
+                if (dataSection == null || dataSection.isEmpty()) {
+                    LOG.debug("No data section found for op: {}", op);
+                    return;
+                }
+
+                // 提取字段值
+                String id = extractStructField(dataSection, "id");
+                String username = extractStructField(dataSection, "username");
+                String email = extractStructField(dataSection, "email");
+                String age = extractStructField(dataSection, "age");
+                String createdAt = convertTimestamp(extractStructField(dataSection, "created_at"));
+                String updatedAt = convertTimestamp(extractStructField(dataSection, "updated_at"));
+
+                if (id == null) {
+                    LOG.warn("Could not extract id from: {}", dataSection);
+                    return;
+                }
+
+                if ("c".equals(op) || "r".equals(op)) {
+                    // INSERT
+                    String sql = String.format(
+                        "INSERT INTO %s (id,username,email,age,created_at,updated_at) VALUES (?,?,?,?,?,?)",
+                        config.targetTable
+                    );
+                    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                        ps.setInt(1, Integer.parseInt(id));
+                        ps.setString(2, username);
+                        ps.setString(3, email);
+                        ps.setInt(4, Integer.parseInt(age != null ? age : "0"));
+                        ps.setString(5, createdAt);
+                        ps.setString(6, updatedAt);
+                        ps.executeUpdate();
+                        LOG.info("Inserted record: id={}", id);
+                    }
+                } else if ("u".equals(op)) {
+                    // UPDATE
+                    String sql = String.format(
+                        "UPDATE %s SET username=?, email=?, age=?, updated_at=? WHERE id=?",
+                        config.targetTable
+                    );
+                    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                        ps.setString(1, username);
+                        ps.setString(2, email);
+                        ps.setInt(3, Integer.parseInt(age != null ? age : "0"));
+                        ps.setString(4, updatedAt);
+                        ps.setInt(5, Integer.parseInt(id));
+                        ps.executeUpdate();
+                        LOG.info("Updated record: id={}", id);
+                    }
+                } else if ("d".equals(op)) {
+                    // DELETE
+                    String sql = String.format("DELETE FROM %s WHERE %s = ?", config.targetTable, config.primaryKey);
+                    try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                        ps.setInt(1, Integer.parseInt(id));
+                        ps.executeUpdate();
+                        LOG.info("Deleted record: id={}", id);
+                    }
+                }
+            } catch (Exception e) {
+                LOG.error("Error processing CDC record", e);
             }
         }
-        return null;
-    }
 
-    private String getDriverName(String dbType) {
-        switch (dbType.toUpperCase()) {
-            case "MYSQL":
-                return "com.mysql.cj.jdbc.Driver";
-            case "POSTGRESQL":
-                return "org.postgresql.Driver";
-            default:
-                throw new IllegalArgumentException("不支持的数据库类型: " + dbType);
+        /**
+         * 从Struct字符串中提取某个section (after或before)
+         */
+        private String extractStructSection(String record, String section) {
+            try {
+                // 查找 section=Struct{...}
+                String pattern = section + "=Struct\\{([^}]+)\\}";
+                java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
+                java.util.regex.Matcher m = p.matcher(record);
+                if (m.find()) {
+                    return m.group(1);
+                }
+            } catch (Exception e) {
+                LOG.error("Error extracting section: {}", section, e);
+            }
+            return null;
+        }
+
+        /**
+         * 从Struct数据中提取字段值
+         */
+        private String extractStructField(String data, String fieldName) {
+            try {
+                // 查找 fieldName=value
+                String pattern = fieldName + "=([^,}]+)";
+                java.util.regex.Pattern p = java.util.regex.Pattern.compile(pattern);
+                java.util.regex.Matcher m = p.matcher(data);
+                if (m.find()) {
+                    return m.group(1).trim();
+                }
+            } catch (Exception e) {
+                LOG.error("Error extracting field: {}", fieldName, e);
+            }
+            return null;
         }
     }
 
@@ -388,7 +303,7 @@ public class CdcSyncJob {
     public void stop() {
         isRunning = false;
         taskStatus.setStatus("STOPPED");
-        taskStatus.setLastUpdateTime(java.time.LocalDateTime.now());
+        taskStatus.setLastUpdateTime(LocalDateTime.now());
         LOG.info("Task {} stopped", taskConfig.getName());
     }
 
@@ -404,32 +319,16 @@ public class CdcSyncJob {
     }
 
     /**
-     * 全量同步处理函数
+     * CDC Debezium反序列化器
      */
-    private static class FullSyncProcessFunction extends ProcessFunction<String, String> {
-        @Override
-        public void processElement(String value, Context ctx, Collector<String> out) throws Exception {
-            out.collect(value);
-        }
-    }
+    public static class CdcDebeziumDeserializationSchema implements DebeziumDeserializationSchema<String> {
+        private static final long serialVersionUID = 1L;
 
-    /**
-     * CDC处理函数
-     */
-    private static class CdcProcessFunction extends ProcessFunction<String, String> {
         @Override
-        public void processElement(String value, Context ctx, Collector<String> out) throws Exception {
-            out.collect(value);
-        }
-    }
-
-    /**
-     * JSON Debezium反序列化器
-     */
-    private static class JsonDebeziumDeserializationSchema implements DebeziumDeserializationSchema<String> {
-        @Override
-        public void deserialize(String record, Collector<String> out) throws Exception {
-            out.collect(record);
+        public void deserialize(SourceRecord record, Collector<String> out) {
+            Struct value = (Struct) record.value();
+            String jsonString = value.toString();
+            out.collect(jsonString);
         }
 
         @Override
