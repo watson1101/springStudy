@@ -1,0 +1,140 @@
+# =============================================
+# 订单服务配置文件
+# 服务端口: 8002
+# 上下文路径: /order-service
+# =============================================
+
+server:
+  # 服务端口号，同一台机器上各微服务端口不能重复
+  port: 8002
+  servlet:
+    # 上下文路径，网关通过此路径将请求路由到本服务
+    context-path: /order-service
+
+spring:
+  # 服务名称，用于注册到 Nacos 时作为服务标识
+  application:
+    name: order-service
+
+  # =============================================
+  # 数据源配置（PostgreSQL 数据库）
+  # =============================================
+  datasource:
+    # PostgreSQL JDBC 驱动类名
+    driver-class-name: org.postgresql.Driver
+    # 数据库连接地址：ms-demo 为项目数据库名
+    url: jdbc:postgresql://localhost:5432/ms-demo
+    # 数据库用户名
+    username: postgres
+    # 数据库密码
+    password: 123456
+    # HikariCP 连接池配置（Spring Boot 2.0+ 默认连接池）
+    hikari:
+      minimum-idle: 5           # 最小空闲连接数
+      maximum-pool-size: 20     # 最大连接池大小
+      connection-timeout: 30000 # 连接超时时间（毫秒）
+      idle-timeout: 600000      # 空闲连接超时时间（毫秒）
+      max-lifetime: 1800000     # 连接最大存活时间（毫秒）
+
+  # =============================================
+  # Redis 缓存配置
+  # =============================================
+  redis:
+    host: localhost             # Redis 服务器地址
+    port: 6379                  # Redis 端口
+    database: 0                 # 使用的数据库索引（0-15）
+    timeout: 3000               # 连接超时时间（毫秒）
+    lettuce:
+      pool:
+        max-active: 8           # 连接池最大连接数
+        max-idle: 8             # 连接池最大空闲连接数
+        min-idle: 0             # 连接池最小空闲连接数
+        max-wait: -1            # 获取连接的最大等待时间（-1 表示无限等待）
+
+  # =============================================
+  # Kafka 消息队列配置
+  # Broker 地址: localhost:9092
+  # =============================================
+  kafka:
+    # Kafka Broker 服务器地址列表（多个用逗号分隔）
+    bootstrap-servers: localhost:9092
+
+    # ---------- 生产者配置 ----------
+    producer:
+      # 消息 key 的序列化器：String -> 字节数组
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      # 消息 value 的序列化器：Java 对象 -> JSON 字符串 -> 字节数组
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+    # ---------- 消费者配置 ----------
+    consumer:
+      # 消费者组 ID，同一个组内的消费者共同消费 topic 的消息
+      group-id: order-service-group
+      # 消息 key 的反序列化器：字节数组 -> String
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      # 消息 value 的反序列化器：字节数组 -> JSON 字符串 -> Java 对象
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        # 允许反序列化所有包中的类（生产环境建议指定具体包名以提升安全性）
+        spring.json.trusted.packages: "*"
+        # JSON 类型映射：告诉反序列化器将 JSON 数据映射到哪个 Java 类
+        # 格式：{类型映射名称}:{完整类名}
+        spring.json.type.mapping: orderStatusChangeMessage:msdemo.hong.com.order.message.OrderStatusChangeMessage
+
+    # ---------- 监听器配置 ----------
+    listener:
+      # 是否自动启动消息监听器（设为 true 表示应用启动后自动开始消费消息）
+      auto-startup: true
+      # 启动时如果发现 topic 不存在是否报错（false 表示不报错，自动创建 topic）
+      missing-topics-fatal: false
+
+# =============================================
+# MyBatis Plus 配置
+# =============================================
+mybatis-plus:
+  # MyBatis XML Mapper 文件存放位置
+  mapper-locations: classpath:mapper/*.xml
+  # 实体类别名包路径（在 XML 中可以直接使用类名，不需写完整包名）
+  type-aliases-package: msdemo.hong.com.order.model.entity
+  configuration:
+    # 开启驼峰命名自动映射（数据库下划线 -> Java 驼峰）
+    map-underscore-to-camel-case: true
+    # MyBatis 日志实现（打印 SQL 到控制台，方便调试）
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      # 主键生成策略：ASSIGN_ID（雪花算法，分布式环境生成唯一 ID）
+      id-type: ASSIGN_ID
+      # 逻辑删除字段名
+      logic-delete-field: isDeleted
+      # 逻辑删除已删除值（1 表示已删除）
+      logic-delete-value: 1
+      # 逻辑删除未删除值（0 表示未删除）
+      logic-not-delete-value: 0
+
+# =============================================
+# 管理端点配置
+# 用于健康检查和监控
+# =============================================
+management:
+  endpoints:
+    web:
+      # 暴露的端点列表（通过 HTTP 访问）
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      # 展示详细的健康检查信息（包括数据库、Redis 等组件的连接状态）
+      show-details: always
+
+# =============================================
+# 日志配置
+# =============================================
+logging:
+  level:
+    root: INFO                            # 全局日志级别
+    msdemo.hong.com.order: DEBUG          # 订单服务业务代码 DEBUG 级别
+    msdemo.hong.com.order.mapper: DEBUG   # MyBatis Mapper SQL 日志
+  pattern:
+    # 日志输出格式：日期 [线程名] 日志级别 类名 - 消息内容
+    console: '%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{50} - %msg%n'

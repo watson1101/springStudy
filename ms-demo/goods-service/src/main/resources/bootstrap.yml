@@ -1,0 +1,29 @@
+# =============================================
+# 商品服务 Bootstrap 配置
+# 用于从Nacos获取配置
+# =============================================
+
+spring:
+  application:
+    name: goods-service
+
+  # Cloud配置
+  cloud:
+    nacos:
+      # 服务发现配置
+      discovery:
+        server-addr: localhost:8848
+        namespace: ms-demo
+        group: DEFAULT_GROUP
+        service: ${spring.application.name}
+      # 配置中心配置
+      config:
+        server-addr: localhost:8848
+        namespace: ms-demo
+        group: DEFAULT_GROUP
+        file-extension: yml
+        # 共享配置
+        shared-configs:
+          - data-id: common-config.yml
+            group: DEFAULT_GROUP
+            refresh: true
