@@ -6,9 +6,8 @@
 <parent>
   <groupId>org.springframework.boot</groupId>
   <artifactId>spring-boot-starter-parent</artifactId>
-  <!--<version>2.7.18</version>-->
   <version>3.3.11</version>
-  <relativePath/> <!-- lookup parent from repository -->
+  <relativePath/>
 </parent>
 
 <groupId>com.hong</groupId>
@@ -24,6 +23,7 @@
         <module>goods-service</module>
         <module>role</module>
         <module>etl</module>
+        <module>multi-thread</module>
     </modules>
 
 <properties>
@@ -51,7 +51,6 @@
 
 <dependencyManagement>
   <dependencies>
-    <!-- Spring Cloud 依赖管理 -->
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-dependencies</artifactId>
@@ -60,7 +59,6 @@
       <scope>import</scope>
     </dependency>
 
-    <!-- Spring Cloud Alibaba 依赖管理 -->
     <dependency>
       <groupId>com.alibaba.cloud</groupId>
       <artifactId>spring-cloud-alibaba-dependencies</artifactId>
@@ -69,7 +67,6 @@
       <scope>import</scope>
     </dependency>
     
-    <!-- 公共依赖版本管理 -->
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-gateway</artifactId>
@@ -193,7 +190,6 @@
     <artifactId>lombok</artifactId>
   </dependency>
   
-  <!-- javax.annotation 依赖 -->
   <dependency>
     <groupId>javax.annotation</groupId>
     <artifactId>javax.annotation-api</artifactId>
@@ -235,5 +231,4 @@
         </plugin>
     </plugins>
   </build>
-
 </project>
