@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MemoApp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app">
+    <header>
+      <h1>MemoApp</h1>
+      <button id="btnSettings" style="background:var(--accent); color:var(--bg); font-weight:bold; cursor:pointer;">⚙ 设置</button>
+    </header>
+
+    <div class="input-area">
+      <input type="text" id="inputTitle" placeholder="快速输入备忘标题，回车添加..." autocomplete="off">
+      <select id="inputPriority">
+        <option value="low">低</option>
+        <option value="medium" selected>中</option>
+        <option value="high">高</option>
+      </select>
+      <button id="btnAdd">添加</button>
+    </div>
+
+    <div class="detail-area" id="detailArea" style="display:none;">
+      <textarea id="inputContent" placeholder="详细内容（可选）"></textarea>
+      <div class="detail-actions">
+        <button id="btnSaveDetail">保存</button>
+        <button id="btnCancelDetail">取消</button>
+      </div>
+    </div>
+
+    <div class="toolbar">
+      <span id="memoCount">0 条备忘</span>
+      <button id="btnRefresh">刷新</button>
+      <button onclick="alert('测试按钮点击成功！')" style="margin-left:10px; padding:4px 12px; background:var(--accent); color:var(--bg); border:none; border-radius:8px; cursor:pointer;">测试</button>
+    </div>
+
+    <ul id="memoList" class="memo-list"></ul>
+  </div>
+
+  <!-- 提醒弹窗 -->
+  <div id="reminderModal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3>设置提醒</h3>
+      <p id="reminderMemoTitle"></p>
+      <label>提醒时间</label>
+      <input type="datetime-local" id="reminderTime">
+      <label>重复</label>
+      <select id="repeatType">
+        <option value="none">不重复（单次）</option>
+        <option value="daily">每天</option>
+        <option value="weekly">每周</option>
+        <option value="monthly">每月</option>
+      </select>
+      <label>间隔</label>
+      <input type="number" id="repeatInterval" value="1" min="1" max="99">
+      <div class="modal-actions">
+        <button id="btnConfirmReminder">确定</button>
+        <button id="btnCancelReminder">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

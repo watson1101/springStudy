@@ -1,18 +1,29 @@
+﻿# ====================================================================
+# Java / Maven 构建产物
+# ====================================================================
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
 
-### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
-.idea/libraries/
+# ====================================================================
+# IDE & Editor 配置
+# ====================================================================
+.idea/
 *.iws
 *.iml
 *.ipr
+.vscode/
+.claude/
 
-### Eclipse ###
+# === Eclipse ===
 .apt_generated
 .classpath
 .factorypath
@@ -21,41 +32,63 @@ target/
 .springBeans
 .sts4-cache
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# === NetBeans ===
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
 
-### VS Code ###
-.vscode/
+# ====================================================================
+# Node.js / JavaScript 依赖
+# ====================================================================
+node_modules/
+.package-lock.json
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-store/
 
-### Mac OS ###
+# ====================================================================
+# Vite / 前端构建缓存
+# ====================================================================
+.vite/
+dist/
+
+# ====================================================================
+# OS 系统文件
+# ====================================================================
 .DS_Store
-/.idea/.gitignore
-/.idea/encodings.xml
-/.idea/material_theme_project_new.xml
-/.idea/misc.xml
-/.idea/vcs.xml
-world-story/user/src/main/java/com/hong/user/dto/UserDTO.java
-.idea/uiDesigner.xml
-springStudy/.idea/compiler.xml
-.gitignore
-world-story/.idea/encodings.xml
-.gitignore
-.gitignore
-.gitignore
-world-story/.idea/compiler.xml
-springStudy/.idea/vcs.xml
-springStudy/.idea/encodings.xml
-springStudy/.idea/jarRepositories.xml
-springStudy/.idea/misc.xml
-world-story/.idea/encodings.xml
-world-story/.idea/jarRepositories.xml
-world-story/.idea/vcs.xml
-world-story/.idea/workspace.xml
-.gitignore
+Thumbs.db
+Desktop.ini
+
+# ====================================================================
+# 日志 / 运行时输出
+# ====================================================================
+*.log
+*.err
+server-*.log
+
+# ====================================================================
+# Electron / 桌面应用打包产物
+# ====================================================================
+*.exe
+*.dll
+*.pak
+*.asar
+*.dat
+*.bin
+snapshot_blob.bin
+v8_context_snapshot.bin
+vk_swiftshader.dll
+vk_swiftshader_icd.json
+vulkan-1.dll
+resources.pak
+
+# ====================================================================
+# 特定项目的构建输出
+# ====================================================================
+memo/dist/
+memo/node_modules/
+simple-memo/windows-client/node_modules/
+ms-web-demo/node_modules/
+ms-web-demo/dist/

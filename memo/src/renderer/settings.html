@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>设置</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="settings-body">
+  <div class="settings-panel">
+    <h2>MySQL 连接设置</h2>
+    <form id="configForm">
+      <label>主机</label>
+      <input type="text" id="cfgHost" value="localhost">
+      <label>端口</label>
+      <input type="number" id="cfgPort" value="3306">
+      <label>数据库名</label>
+      <input type="text" id="cfgDatabase" value="memo_db">
+      <label>用户名</label>
+      <input type="text" id="cfgUser" value="root">
+      <label>密码</label>
+      <input type="password" id="cfgPassword" value="123456">
+      <div class="settings-actions">
+        <button type="button" id="btnTest">测试连接</button>
+        <button type="button" id="btnSave">保存</button>
+      </div>
+      <div id="testResult" class="test-result"></div>
+    </form>
+  </div>
+  <script>
+    const { api } = window;
+
+    (async () => {
+      const cfg = await api.db.getConfig();
+      document.getElementById('cfgHost').value = cfg.host;
+      document.getElementById('cfgPort').value = cfg.port;
+      document.getElementById('cfgDatabase').value = cfg.database;
+      document.getElementById('cfgUser').value = cfg.user;
+      document.getElementById('cfgPassword').value = cfg.password;
+    })();
+
+    function getConfig() {
+      return {
+        host: document.getElementById('cfgHost').value,
+        port: parseInt(document.getElementById('cfgPort').value),
+        database: document.getElementById('cfgDatabase').value,
+        user: document.getElementById('cfgUser').value,
+        password: document.getElementById('cfgPassword').value
+      };
+    }
+
+    document.getElementById('btnTest').addEventListener('click', async () => {
+      const result = document.getElementById('testResult');
+      result.textContent = '测试中...';
+      result.className = 'test-result';
+      const res = await api.db.testConnection(getConfig());
+      if (res.success) {
+        result.textContent = '连接成功！数据库已就绪。';
+        result.className = 'test-result success';
+      } else {
+        result.textContent = '连接失败: ' + res.error;
+        result.className = 'test-result error';
+      }
+    });
+
+    document.getElementById('btnSave').addEventListener('click', async () => {
+      const config = getConfig();
+      await api.db.saveConfig(config);
+      const initRes = await api.db.init();
+      const result = document.getElementById('testResult');
+      if (initRes.success) {
+        result.textContent = '保存成功！数据库已初始化。';
+        result.className = 'test-result success';
+      } else {
+        result.textContent = '保存成功但初始化失败: ' + initRes.error;
+        result.className = 'test-result error';
+      }
+    });
+  </script>
+</body>
+</html>
