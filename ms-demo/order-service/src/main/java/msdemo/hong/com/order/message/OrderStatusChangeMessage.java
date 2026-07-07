@@ -1,5 +1,6 @@
 package msdemo.hong.com.order.message;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,6 +32,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "订单状态变更消息实体，通过Kafka传输")
 public class OrderStatusChangeMessage implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -41,6 +43,7 @@ public class OrderStatusChangeMessage implements Serializable {
      * <p>全局唯一标识，用于唯一确定一个订单。
      * 同时也是 Kafka 消息的 key，保证同一订单的消息按顺序在同一个分区消费。</p>
      */
+        @Schema(description = "订单ID", example = "ORD-001")
     private String orderId;
 
     /**
@@ -49,6 +52,7 @@ public class OrderStatusChangeMessage implements Serializable {
      * <p>用户可读的订单号，通常包含日期序列等信息，格式如 {@code ORDER-20240101-0001}。
      * 用于在前端展示和客服查询。</p>
      */
+        @Schema(description = "订单编号", example = "ORDER-ORD-001")
     private String orderNo;
 
     /**
@@ -70,6 +74,7 @@ public class OrderStatusChangeMessage implements Serializable {
      *
      * <p>订单变更后的状态值，例如：{@code PAID}（已支付）、{@code SHIPPED}（已发货）。</p>
      */
+        @Schema(description = "新状态", example = "PAID")
     private String newStatus;
 
     /**

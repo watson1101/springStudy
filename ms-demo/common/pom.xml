@@ -91,6 +91,12 @@
             <optional>true</optional>
         </dependency>
 
+        <!-- SpringDoc OpenAPI (Swagger接口文档) -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+        </dependency>
+
         <!-- Validation (参数校验) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

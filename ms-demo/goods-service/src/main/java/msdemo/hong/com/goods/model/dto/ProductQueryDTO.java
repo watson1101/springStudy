@@ -2,6 +2,7 @@ package msdemo.hong.com.goods.model.dto;
 
 import lombok.Data;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.Serializable;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
  * @since 1.0.0
  */
 @Data
+@Schema(description = "商品分页查询请求参数")
 public class ProductQueryDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -21,11 +23,13 @@ public class ProductQueryDTO implements Serializable {
     /**
      * 商品名称（模糊查询）
      */
+    @Schema(description = "商品名称（模糊查询）", example = "iPhone")
     private String productName;
 
     /**
      * 商品分类ID（雪花算法生成的Long型ID）
      */
+    @Schema(description = "商品分类ID", example = "20000000001")
     private Long categoryId;
 
     /**
@@ -58,10 +62,12 @@ public class ProductQueryDTO implements Serializable {
     /**
      * 当前页码（默认第1页）
      */
+    @Schema(description = "当前页码", example = "1")
     private Integer current = 1;
 
     /**
      * 每页大小（默认10条）
      */
+    @Schema(description = "每页条数", example = "10")
     private Integer size = 10;
 }

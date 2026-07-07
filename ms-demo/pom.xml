@@ -24,6 +24,8 @@
         <module>role</module>
         <module>etl</module>
         <module>multi-thread</module>
+        <module>flink-demo1</module>
+        <module>sso-demo</module>
     </modules>
 
 <properties>
@@ -47,6 +49,9 @@
   <hutool.version>5.8.37</hutool.version>
   <postgresql.version>42.7.3</postgresql.version>
   <fastjson.version>2.0.43</fastjson.version>
+  <springdoc.version>2.6.0</springdoc.version>
+  <flink.version>1.18.0</flink.version>
+  <scala.binary.version>2.12</scala.binary.version>
 </properties>
 
 <dependencyManagement>
@@ -66,7 +71,7 @@
       <type>pom</type>
       <scope>import</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-gateway</artifactId>
@@ -78,13 +83,13 @@
       <artifactId>spring-cloud-starter-loadbalancer</artifactId>
       <version>${spring-cloud-loadbalancer.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.cloud</groupId>
       <artifactId>spring-cloud-starter-openfeign</artifactId>
       <version>${spring-cloud-openfeign.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter</artifactId>
@@ -96,7 +101,7 @@
       <artifactId>spring-boot-starter-web</artifactId>
       <version>${spring-boot.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>com.baomidou</groupId>
       <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
@@ -114,35 +119,65 @@
       <artifactId>spring-cloud-starter-bootstrap</artifactId>
       <version>${spring-cloud-starter-bootstrap.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>com.alibaba.cloud</groupId>
       <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
       <version>${nacos-discovery.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>com.alibaba.cloud</groupId>
       <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
       <version>${nacos-config.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>com.alibaba.cloud</groupId>
       <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
       <version>${sentinel.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>cn.hutool</groupId>
       <artifactId>hutool-core</artifactId>
       <version>${hutool.version}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
       <version>${fastjson.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-java</artifactId>
+      <version>${flink.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-streaming-java</artifactId>
+      <version>${flink.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-clients</artifactId>
+      <version>${flink.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.flink</groupId>
+      <artifactId>flink-connector-kafka</artifactId>
+      <version>3.2.0-1.18</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+      <version>${springdoc.version}</version>
     </dependency>
   </dependencies>
 </dependencyManagement>
@@ -174,7 +209,6 @@
     <artifactId>spring-boot-starter-test</artifactId>
     <scope>test</scope>
   </dependency>
-  <!--redis-->
   <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-data-redis</artifactId>
@@ -189,7 +223,7 @@
     <groupId>org.projectlombok</groupId>
     <artifactId>lombok</artifactId>
   </dependency>
-  
+
   <dependency>
     <groupId>javax.annotation</groupId>
     <artifactId>javax.annotation-api</artifactId>

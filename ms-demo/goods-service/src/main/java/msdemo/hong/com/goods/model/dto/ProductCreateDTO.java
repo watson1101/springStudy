@@ -2,6 +2,7 @@ package msdemo.hong.com.goods.model.dto;
 
 import lombok.Data;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
  * @since 1.0.0
  */
 @Data
+@Schema(description = "商品创建请求参数")
 public class ProductCreateDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -25,6 +27,7 @@ public class ProductCreateDTO implements Serializable {
     /**
      * 商品名称
      */
+    @Schema(description = "商品名称", requiredMode = Schema.RequiredMode.REQUIRED, example = "Apple iPhone 15")
     @NotBlank(message = "商品名称不能为空")
     @Size(max = 200, message = "商品名称长度不能超过200个字符")
     private String productName;
@@ -58,6 +61,7 @@ public class ProductCreateDTO implements Serializable {
     /**
      * 商品价格
      */
+    @Schema(description = "商品价格（单位：元）", requiredMode = Schema.RequiredMode.REQUIRED, example = "5999.00")
     @NotNull(message = "商品价格不能为空")
     @Positive(message = "商品价格必须大于0")
     private BigDecimal price;
@@ -75,6 +79,7 @@ public class ProductCreateDTO implements Serializable {
     /**
      * 库存数量
      */
+    @Schema(description = "库存数量", requiredMode = Schema.RequiredMode.REQUIRED, example = "100")
     @NotNull(message = "库存数量不能为空")
     private Integer stockQuantity;
 

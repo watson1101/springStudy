@@ -147,7 +147,13 @@
             <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
 
-        <!-- Spring Boot Actuator (健康检查和监控) -->
+            <!-- SpringDoc OpenAPI (Swagger接口文档) -->
+    <dependency>
+      <groupId>org.springdoc</groupId>
+      <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    </dependency>
+
+    <!-- Spring Boot Actuator (健康检查和监控) -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>

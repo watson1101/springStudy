@@ -92,3 +92,8 @@ memo/node_modules/
 simple-memo/windows-client/node_modules/
 ms-web-demo/node_modules/
 ms-web-demo/dist/
+
+# ====================================================================
+# Android / Gradle 构建缓存
+# ====================================================================
+.gradle/

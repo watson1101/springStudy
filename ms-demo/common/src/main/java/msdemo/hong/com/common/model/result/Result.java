@@ -1,6 +1,7 @@
 package msdemo.hong.com.common.model.result;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -23,6 +24,7 @@ import java.io.Serializable;
  * @since 1.0.0
  */
 @Data
+@Schema(description = "统一返回结果，所有API接口都使用此类包装返回值")
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Result<T> implements Serializable {
 
@@ -31,21 +33,25 @@ public class Result<T> implements Serializable {
     /**
      * 状态码
      */
+        @Schema(description = "状态码：200-成功，其他-失败", example = "200")
     private Integer code;
 
     /**
      * 返回消息
      */
+        @Schema(description = "提示信息", example = "操作成功")
     private String message;
 
     /**
      * 返回数据
      */
+        @Schema(description = "返回数据")
     private T data;
 
     /**
      * 时间戳
      */
+        @Schema(description = "时间戳（毫秒）", example = "1700000000000")
     private Long timestamp;
 
     /**

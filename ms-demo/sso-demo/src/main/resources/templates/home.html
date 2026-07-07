@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSO单点登录 - 首页</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .navbar h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .navbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .navbar .user-info span {
+            font-size: 14px;
+        }
+        
+        .navbar .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: white;
+            border: 1px solid white;
+        }
+        
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-header .icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+        }
+        
+        .card-header .icon.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-header .icon.token {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .card-header .icon.sso {
+            background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%);
+        }
+        
+        .card-header h2 {
+            font-size: 18px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .user-detail {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .detail-item {
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .detail-item label {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 5px;
+        }
+        
+        .detail-item value {
+            display: block;
+            font-size: 16px;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .token-display {
+            padding: 15px;
+            background: #1e1e1e;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+            color: #00ff88;
+            word-break: break-all;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .token-display .token-label {
+            color: #888;
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .demo-section {
+            margin-top: 20px;
+        }
+        
+        .demo-section h3 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .system-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        
+        .system-btn {
+            padding: 12px 24px;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+            color: #667eea;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .system-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+        
+        .logout-section {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .sso-flow {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+        
+        .sso-flow h4 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .sso-flow ol {
+            padding-left: 20px;
+        }
+        
+        .sso-flow li {
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>SSO单点登录演示系统</h1>
+        <div class="user-info">
+            <span th:text="${user.nickname}"></span>
+            <div class="avatar" th:text="${user.username.charAt(0)}"></div>
+            <a href="/logout" class="btn btn-outline">退出登录</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <div class="icon user">👤</div>
+                <h2>当前登录用户信息</h2>
+            </div>
+            <div class="user-detail">
+                <div class="detail-item">
+                    <label>用户ID</label>
+                    <value th:text="${user.userId}"></value>
+                </div>
+                <div class="detail-item">
+                    <label>用户名</label>
+                    <value th:text="${user.username}"></value>
+                </div>
+                <div class="detail-item">
+                    <label>昵称</label>
+                    <value th:text="${user.nickname}"></value>
+                </div>
+                <div class="detail-item">
+                    <label>邮箱</label>
+                    <value th:text="${user.email}"></value>
+                </div>
+                <div class="detail-item">
+                    <label>手机号</label>
+                    <value th:text="${user.phone}"></value>
+                </div>
+                <div class="detail-item">
+                    <label>角色</label>
+                    <value th:text="${user.roles}"></value>
+                </div>
+                <div class="detail-item">
+                    <label>所属系统</label>
+                    <value th:text="${user.systemId}"></value>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="icon token">🔑</div>
+                <h2>SSO令牌信息</h2>
+            </div>
+            <div class="token-display">
+                <span class="token-label">JWT Token:</span>
+                <span th:text="${token}"></span>
+            </div>
+            <div class="logout-section">
+                <a href="/logout" class="btn btn-secondary">本地登出</a>
+                <a href="/global-logout" class="btn btn-danger">全局登出</a>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="icon sso">🌐</div>
+                <h2>模拟其他模块登录演示</h2>
+            </div>
+            <div class="sso-flow">
+                <h4>SSO单点登录流程说明：</h4>
+                <ol>
+                    <li><strong>用户访问客户端系统</strong>：用户访问受保护的资源（如首页）</li>
+                    <li><strong>重定向到SSO Server</strong>：客户端系统检测到用户未登录，重定向到SSO登录页面</li>
+                    <li><strong>用户认证</strong>：用户在SSO Server输入用户名密码进行认证</li>
+                    <li><strong>签发令牌</strong>：SSO Server验证通过后，签发JWT令牌</li>
+                    <li><strong>重定向回客户端</strong>：SSO Server重定向回客户端回调地址，携带令牌</li>
+                    <li><strong>验证令牌</strong>：客户端调用SSO Server验证令牌有效性</li>
+                    <li><strong>创建本地会话</strong>：验证通过后，客户端创建本地会话</li>
+                    <li><strong>访问资源</strong>：用户成功访问受保护的资源</li>
+                </ol>
+            </div>
+            <div class="demo-section">
+                <h3>点击下方按钮模拟其他模块通过SSO登录：</h3>
+                <div class="system-buttons">
+                    <button class="system-btn" onclick="simulateLogin('user-service')">👤 用户服务 (user-service)</button>
+                    <button class="system-btn" onclick="simulateLogin('order-service')">🛒 订单服务 (order-service)</button>
+                    <button class="system-btn" onclick="simulateLogin('goods-service')">📦 商品服务 (goods-service)</button>
+                    <button class="system-btn" onclick="simulateLogin('role-service')">🔒 角色服务 (role-service)</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function simulateLogin(system) {
+            fetch('/simulate-login?system=' + system)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        alert(data.message);
+                        window.location.href = data.data;
+                    } else {
+                        alert('登录失败: ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('模拟登录失败:', error);
+                    alert('模拟登录失败: ' + error.message);
+                });
+        }
+    </script>
+</body>
+</html>

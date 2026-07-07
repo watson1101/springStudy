@@ -468,3 +468,23 @@ msdemo.hong.com.goods
 - 实现库存管理功能
 - 提供100条商品初始化数据
 - 提供Feign客户端接口
+
+## Swagger 接口文档
+
+本服务使用 SpringDoc OpenAPI 作为接口文档框架。
+
+### 访问地址
+
+```bash
+# Swagger UI
+http://localhost:8003/goods-service/swagger-ui/index.html
+
+# OpenAPI 规范（JSON）
+http://localhost:8003/goods-service/v3/api-docs
+```
+
+### 接口分类
+
+| 标签 | 说明 |
+|------|------|
+| 商品管理 | 商品CRUD、库存管理等核心接口 |

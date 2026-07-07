@@ -364,3 +364,22 @@ msdemo.hong.com.order
 - 实现 Kafka 消息发送和消费演示功能
 - 提供订单状态变更消息测试接口
 - 完整的代码注释和文档
+## Swagger 接口文档
+
+本服务使用 SpringDoc OpenAPI 作为接口文档框架。
+
+### 访问地址
+
+```bash
+# Swagger UI
+http://localhost:8002/order-service/swagger-ui/index.html
+
+# OpenAPI 规范（JSON）
+http://localhost:8002/order-service/v3/api-docs
+```
+
+### 接口分类
+
+| 标签 | 说明 |
+|------|------|
+| 订单消息 | Kafka 消息发送测试接口 |

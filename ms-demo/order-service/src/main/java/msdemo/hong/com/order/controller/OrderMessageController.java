@@ -5,6 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import msdemo.hong.com.common.model.result.Result;
 import msdemo.hong.com.order.message.OrderEventProducer;
 import msdemo.hong.com.order.message.OrderStatusChangeMessage;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -26,6 +29,7 @@ import java.time.LocalDateTime;
  * @since 1.0.0
  */
 @Slf4j
+@Tag(name = "订单消息", description = "Kafka 消息发送测试接口，用于演示订单状态变更消息的发送和消费")
 @RestController
 @RequestMapping("/order/message")
 @RequiredArgsConstructor
@@ -56,9 +60,12 @@ public class OrderMessageController {
      * @param userId  用户ID（可选，默认 {@code USER-001}）
      * @return 发送结果，包含订单ID和提示信息
      */
+    @Operation(summary = "发送订单状态变更消息", description = "模拟订单从「已创建(CREATED)」变更为「已支付(PAID)」的场景，将消息发送到Kafka")
     @PostMapping("/send")
     public Result<String> sendOrderStatusChangeMessage(
+            @Parameter(description = "订单ID", example = "ORD-001")
             @RequestParam(value = "orderId", required = false, defaultValue = "ORD-001") String orderId,
+            @Parameter(description = "用户ID", example = "USER-001")
             @RequestParam(value = "userId", required = false, defaultValue = "USER-001") String userId) {
 
         log.info("请求发送订单状态变更消息: orderId={}, userId={}", orderId, userId);
@@ -108,14 +115,15 @@ public class OrderMessageController {
      * @param desc       变更描述（可选，默认 "订单状态已变更"）
      * @return 发送结果，包含订单ID和提示信息
      */
+    @Operation(summary = "发送自定义订单状态变更消息", description = "允许自定义订单ID、新旧状态等参数，灵活测试不同状态变更场景")
     @PostMapping("/send/custom")
     public Result<String> sendCustomMessage(
-            @RequestParam("orderId") String orderId,
-            @RequestParam(value = "orderNo", required = false, defaultValue = "") String orderNo,
-            @RequestParam(value = "userId", required = false, defaultValue = "USER-001") String userId,
-            @RequestParam(value = "oldStatus", required = false, defaultValue = "CREATED") String oldStatus,
-            @RequestParam(value = "newStatus", required = false, defaultValue = "PAID") String newStatus,
-            @RequestParam(value = "desc", required = false, defaultValue = "订单状态已变更") String desc) {
+            @Parameter(description = "订单ID", required = true) @RequestParam("orderId") String orderId,
+            @Parameter(description = "订单编号") @RequestParam(value = "orderNo", required = false, defaultValue = "") String orderNo,
+            @Parameter(description = "用户ID") @RequestParam(value = "userId", required = false, defaultValue = "USER-001") String userId,
+            @Parameter(description = "原状态", example = "CREATED") @RequestParam(value = "oldStatus", required = false, defaultValue = "CREATED") String oldStatus,
+            @Parameter(description = "新状态", example = "PAID") @RequestParam(value = "newStatus", required = false, defaultValue = "PAID") String newStatus,
+            @Parameter(description = "变更描述", example = "订单已支付成功") @RequestParam(value = "desc", required = false, defaultValue = "订单状态已变更") String desc) {
 
         log.info("请求发送自定义订单状态变更消息: orderId={}, {}→{}", orderId, oldStatus, newStatus);
 

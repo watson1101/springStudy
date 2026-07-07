@@ -1,6 +1,7 @@
 package msdemo.hong.com.goods.model.vo;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
  * @since 1.0.0
  */
 @Data
+@Schema(description = "商品信息（包含衍生字段）")
 public class ProductVO implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -29,11 +31,13 @@ public class ProductVO implements Serializable {
      * 避免前端 JavaScript 处理 Large Long 时的精度丢失问题。</p>
      */
     @JsonSerialize(using = ToStringSerializer.class)
+    @Schema(description = "商品ID（雪花算法生成）", example = "10000000001")
     private Long id;
 
     /**
      * 商品名称
      */
+    @Schema(description = "商品名称", example = "Apple iPhone 15")
     private String productName;
 
     /**
@@ -60,6 +64,7 @@ public class ProductVO implements Serializable {
     /**
      * 商品价格
      */
+    @Schema(description = "商品价格（单位：元）", example = "5999.00")
     private BigDecimal price;
 
     /**
@@ -90,16 +95,19 @@ public class ProductVO implements Serializable {
     /**
      * 可用库存（库存数量 - 冻结库存）
      */
+    @Schema(description = "可用库存", example = "50")
     private Integer availableStock;
 
     /**
      * 商品状态：0-下架 1-上架 2-售罄
      */
+    @Schema(description = "商品状态：0-下架 1-上架 2-售罄", example = "1")
     private Integer status;
 
     /**
      * 商品状态描述
      */
+    @Schema(description = "状态描述", example = "上架")
     private String statusDesc;
 
     /**

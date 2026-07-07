@@ -1,7 +1,6 @@
 # ms-demo 微服务学习项目
 
 ## 项目简介
-
 这是一个基于 Spring Boot 3.3 + Spring Cloud 2023 + Spring Cloud Alibaba 的微服务学习项目，涵盖了微服务架构的核心组件和常用功能，适合初学者学习和实践微服务开发。
 
 ## 技术栈
@@ -25,6 +24,9 @@
 - **Redis**: 缓存中间件
 - **Kafka**: 消息队列
 
+### API 文档
+- **SpringDoc OpenAPI**: 2.6.0 (Swagger 接口文档)
+
 ### 工具类库
 - **Hutool**: 5.8.37 (Java工具类库)
 - **FastJSON**: 2.0.43 (JSON处理)
@@ -32,6 +34,10 @@
 
 ### 数据处理
 - **Apache Flink**: 1.18.0 (流式数据处理)
+
+### 安全认证
+- **JWT**: 0.12.5 (令牌认证)
+- **SSO**: 单点登录演示模块
 
 ## 项目结构
 
@@ -41,134 +47,44 @@ ms-demo/
 ├── README.md                        # 项目说明文档
 ├── demand.md                        # 项目需求文档
 ├── env.md                           # 环境配置文档
-│
 ├── common/                          # 公共模块
 │   ├── pom.xml
 │   └── src/main/
-│       ├── java/msdemo/hong/com/common/
-│       │   ├── config/              # 通用配置类
-│       │   ├── constant/            # 常量定义
-│       │   ├── enums/               # 枚举类
-│       │   ├── exception/           # 自定义异常
-│       │   ├── model/               # 通用模型
-│       │   │   ├── dto/             # 数据传输对象
-│       │   │   ├── vo/              # 视图对象
-│       │   │   └── result/          # 统一返回结果
-│       │   └── util/                # 工具类
-│       └── resources/
-│
+│       └── java/msdemo/hong/com/common/
+│           ├── config/              # 通用配置类（含 SpringDoc 配置）
+│           ├── constant/            # 常量定义
+│           ├── enums/               # 枚举类
+│           ├── exception/           # 自定义异常
+│           ├── model/               # 通用模型
+│           │   ├── dto/             # 数据传输对象
+│           │   ├── vo/              # 视图对象
+│           │   └── result/          # 统一返回结果
+│           └── util/                # 工具类
 ├── gateway-service/                 # 网关服务
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/msdemo/hong/com/gateway/
-│       │   ├── config/              # 网关配置
-│       │   ├── filter/              # 网关过滤器
-│       │   └── handler/             # 处理器
-│       │   └── GatewayApplication.java
-│       └── resources/
-│           ├── application.yml
-│           ├── bootstrap.yml
-│           └── logback-spring.xml
-│
 ├── user-service/                    # 用户服务
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/msdemo/hong/com/user/
-│       │   ├── controller/          # 控制层
-│       │   ├── service/             # 服务层
-│       │   ├── mapper/              # 数据访问层
-│       │   ├── model/               # 模型层
-│       │   │   ├── entity/         # 实体类
-│       │   │   ├── dto/            # 数据传输对象
-│       │   │   └── vo/             # 视图对象
-│       │   └── config/             # 配置类
-│       └── resources/
-│           ├── sql/                 # SQL脚本
-│           ├── mapper/              # MyBatis映射文件
-│           ├── application.yml
-│           └── bootstrap.yml
-│
-├── order-service/                    # 订单服务
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/msdemo/hong/com/order/
-│       │   ├── controller/          # 控制层
-│       │   ├── service/impl/        # 服务层及实现
-│       │   ├── mapper/              # 数据访问层
-│       │   ├── model/               # 模型层
-│       │   │   ├── entity/         # 实体类
-│       │   │   ├── dto/            # 数据传输对象
-│       │   │   └── vo/             # 视图对象
-│       │   └── config/             # 配置类
-│       └── resources/
-│           ├── sql/                 # SQL脚本
-│           ├── mapper/              # MyBatis映射文件
-│           ├── application.yml
-│           └── bootstrap.yml
-│
-├── goods-service/                    # 商品服务
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/msdemo/hong/com/goods/
-│       │   ├── controller/          # 控制层
-│       │   ├── service/impl/        # 服务层及实现
-│       │   ├── mapper/              # 数据访问层
-│       │   ├── model/               # 模型层
-│       │   │   ├── entity/         # 实体类
-│       │   │   ├── dto/            # 数据传输对象
-│       │   │   └── vo/             # 视图对象
-│       │   └── config/             # 配置类
-│       └── resources/
-│           ├── sql/                 # SQL脚本
-│           ├── mapper/              # MyBatis映射文件
-│           ├── application.yml
-│           └── bootstrap.yml
-│
-├── role/                             # 角色权限服务
-│   ├── pom.xml
-│   └── src/main/
-│       ├── java/msdemo/hong/com/role/
-│       │   ├── controller/          # 控制层
-│       │   ├── service/impl/        # 服务层及实现
-│       │   ├── mapper/              # 数据访问层
-│       │   ├── model/               # 模型层
-│       │   │   ├── entity/         # 实体类
-│       │   │   ├── dto/            # 数据传输对象
-│       │   │   └── vo/             # 视图对象
-│       │   └── config/             # 配置类
-│       └── resources/
-│           ├── sql/                 # SQL脚本
-│           ├── mapper/              # MyBatis映射文件
-│           ├── application.yml
-│           └── bootstrap.yml
-│
-└── etl/                              # 数据处理服务
-    ├── pom.xml
-    └── src/main/
-        ├── java/msdemo/hong/com/etl/
-        │   ├── config/             # 配置类
-        │   ├── utils/               # 工具类
-        │   ├── flink/               # Flink流处理
-        │   │   ├── source/          # 数据源
-        │   │   ├── transform/       # 数据转换
-        │   │   └── sink/            # 数据输出
-        │   └── EtlApplication.java
-        └── resources/
-            ├── application.yml
-            └── bootstrap.yml
+├── order-service/                   # 订单服务
+├── goods-service/                   # 商品服务
+├── role/                            # 角色权限服务
+├── etl/                             # 数据处理服务
+├── multi-thread/                    # Java多线程验证模块
+├── flink-demo1/                     # Flink流处理学习示例
+└── sso-demo/                        # SSO单点登录演示模块
 ```
 
 ## 模块说明
 
-| 模块 | 端口 | 功能描述 |
-|------|------|----------|
-| gateway-service | 8000 | 统一网关入口、路由转发、限流熔断 |
-| user-service | 8001 | 用户注册登录、信息管理、认证授权 |
-| order-service | 8002 | 订单创建、查询、状态管理、支付对接 |
-| goods-service | 8003 | 商品管理、库存管理、价格管理 |
-| role | 8004 | 角色权限管理、RBAC权限控制 |
-| etl | 8005 | 数据抽取、转换、加载、实时流处理 |
-| common | - | 公共组件、工具类、通用配置 |
+| 模块 | 端口 | 功能描述 | Swagger UI |
+|------|------|----------|-----------|
+| gateway-service | 8000 | 统一网关入口、路由转发、限流熔断 | - |
+| user-service | 8001 | 用户注册登录、信息管理、认证授权 | `/user-service/swagger-ui/index.html` |
+| order-service | 8002 | 订单创建、查询、状态管理、支付对接 | `/order-service/swagger-ui/index.html` |
+| goods-service | 8003 | 商品管理、库存管理、价格管理 | `/goods-service/swagger-ui/index.html` |
+| role | 8004 | 角色权限管理、RBAC权限控制 | `/role/swagger-ui/index.html` |
+| etl | 8005 | 数据抽取、转换、加载、实时流处理 | - |
+| multi-thread | - | Java多线程技术验证模块 | - |
+| flink-demo1 | - | Flink流处理学习示例 | - |
+| sso-demo | 8006 | SSO单点登录演示模块 | `/sso-demo/swagger-ui/index.html` |
+| common | - | 公共组件、工具类、通用配置 | - |
 
 ## 环境要求
 
@@ -178,34 +94,59 @@ ms-demo/
 - IDE (IntelliJ IDEA / Eclipse)
 
 ### 中间件
-
-#### MySQL 数据库
-```
-地址: localhost:3306
-用户名: root
-密码: 123456
-数据库: ms-demo
-```
+#### PostgreSQL 数据库
+- 地址: localhost:5432
+- 用户名: postgres
+- 密码: 123456
+- 数据库: ms-demo
 
 #### Redis 缓存
-```
-地址: localhost:6379
-```
+- 地址: localhost:6379
 
 #### Kafka 消息队列
-```
-Broker: localhost:9092
-Controller: localhost:9093
-```
+- Broker: localhost:9092
+- Controller: localhost:9093
 
 #### Nacos 服务
+- 地址: localhost:8848
+- 命名空间: ms-demo
+
+## Swagger 接口文档
+
+本项目使用 SpringDoc OpenAPI 2.6.0 作为接口文档框架（Spring Boot 3.x 的推荐方案）。
+
+### 访问地址
+
+各服务启动后，可以通过以下地址访问 Swagger UI：
+
+| 服务 | 地址 |
+|------|------|
+| 商品服务 | http://localhost:8003/goods-service/swagger-ui/index.html |
+| 订单服务 | http://localhost:8002/order-service/swagger-ui/index.html |
+| 用户服务 | http://localhost:8001/user-service/swagger-ui/index.html |
+| 角色服务 | http://localhost:8004/role/swagger-ui/index.html |
+
+### API 文档 JSON
+
+```bash
+# 获取商品服务的 OpenAPI 规范（JSON 格式）
+curl http://localhost:8003/goods-service/v3/api-docs
+
+# 获取订单服务的 OpenAPI 规范（YAML 格式）
+curl http://localhost:8002/order-service/v3/api-docs.yaml
 ```
-地址: localhost:8848
-命名空间: ms-demo
-```
+
+### 常用注解说明
+
+| 注解 | 作用 | 使用位置 |
+|------|------|----------|
+| `@Tag` | 标注模块分组 | Controller 类 |
+| `@Operation` | 描述接口功能 | Controller 方法 |
+| `@Parameter` | 描述请求参数 | 方法参数 |
+| `@Schema` | 描述数据模型 | DTO/VO 类及字段 |
+| `@ApiResponse` | 描述响应信息 | Controller 方法 |
 
 ## 数据库设计规范
-
 - 数据库名称: `ms-demo`
 - 表名规范: `{模块简称}_{功能描述}`
   - 用户服务表前缀: `user_`
@@ -228,7 +169,8 @@ msdemo.hong.com.{模块名}
 │   ├── entity      // 数据库实体
 │   ├── dto         // 数据传输对象
 │   └── vo          // 视图对象
-└── config          // 配置类
+├── config          // 配置类
+└── Application.java // 启动类
 ```
 
 ## 快速开始
@@ -243,13 +185,12 @@ cd ms-demo
 ### 2. 启动基础服务
 
 启动以下中间件:
-- MySQL
+- PostgreSQL
 - Redis
 - Kafka
 - Nacos
 
 ### 3. 创建数据库
-
 ```sql
 CREATE DATABASE `ms-demo` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
@@ -261,7 +202,7 @@ CREATE DATABASE `ms-demo` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_
 {module}/src/main/resources/sql/*.sql
 ```
 
-### 5. 配置Nacos
+### 5. 配置 Nacos
 
 在 Nacos 控制台创建以下配置:
 
@@ -269,8 +210,8 @@ CREATE DATABASE `ms-demo` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_
 ```yaml
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:3306/ms-demo
-    username: root
+    url: jdbc:postgresql://localhost:5432/ms-demo
+    username: postgres
     password: 123456
   redis:
     host: localhost
@@ -286,21 +227,22 @@ mvn clean install
 ### 7. 启动服务
 
 按以下顺序启动服务:
-1. gateway-service
-2. user-service
-3. order-service
-4. goods-service
-5. role
-6. etl
+1. gateway-service（端口 8000）
+2. user-service（端口 8001）
+3. order-service（端口 8002）
+4. goods-service（端口 8003）
+5. role（端口 8004）
+6. etl（端口 8005）
 
 ## 开发规范
 
 ### 1. 代码注释
 
-项目需要提供详细的代码注释，便于新手学习:
-- 类添加功能描述
+项目需要提供详细的代码注释，方便新手学习:
+- 类添加功能描述注释
 - 方法添加参数和返回值说明
 - 复杂逻辑添加详细注释
+- Controller 接口添加 Swagger 注解
 
 ### 2. 接口规范
 
@@ -309,7 +251,8 @@ mvn clean install
 {
   "code": 200,
   "message": "success",
-  "data": {}
+  "data": {},
+  "timestamp": 1700000000000
 }
 ```
 
@@ -318,7 +261,8 @@ mvn clean install
 {
   "code": 500,
   "message": "错误描述",
-  "data": null
+  "data": null,
+  "timestamp": 1700000000000
 }
 ```
 
@@ -341,6 +285,156 @@ mvn clean install
 5. **goods-service**: 学习库存管理和缓存应用
 6. **role**: 学习 RBAC 权限控制
 7. **etl**: 学习流式数据处理
+8. **multi-thread**: 学习 Java 多线程技术
+9. **flink-demo1**: 学习 Flink 流处理框架
+10. **sso-demo**: 学习单点登录（SSO）原理与实现
+
+## SSO 单点登录模块 (sso-demo)
+
+### 模块简介
+
+`sso-demo` 模块模拟了单点登录（Single Sign-On）的完整流程，包含两个核心角色：
+
+- **SSO Server (身份提供者/IdP)**: 负责用户认证和令牌发放
+- **SSO Client (服务提供者/SP)**: 负责令牌验证和资源保护
+
+通过该模块，可以学习如何实现其他模块（如 user-service、order-service）通过 SSO 登录当前系统。
+
+### 技术实现
+
+- **JWT**: 使用 jjwt 库生成和验证令牌
+- **Redis**: 存储令牌和会话信息
+- **Spring MVC**: 处理 HTTP 请求和拦截器
+- **Thymeleaf**: 渲染登录页面和首页
+
+### 核心文件结构
+
+```
+sso-demo/
+├── src/main/java/msdemo/hong/com/ssodemo/
+│   ├── SsoDemoApplication.java      # 启动类
+│   ├── common/                      # 公共层
+│   │   ├── JwtUtil.java             # JWT工具类
+│   │   ├── SsoConstants.java        # 常量定义
+│   │   ├── SsoProperties.java       # 配置属性类
+│   │   ├── SsoUserDTO.java          # 用户数据传输对象
+│   │   └── Result.java              # 统一返回结果类
+│   ├── server/                      # SSO Server层（身份提供者）
+│   │   ├── SsoServerController.java # 服务端控制器
+│   │   └── SsoServerService.java    # 服务端业务逻辑
+│   └── client/                      # SSO Client层（服务提供者）
+│       ├── SsoClientController.java # 客户端控制器
+│       ├── SsoClientService.java    # 客户端业务逻辑
+│       ├── SsoClientConfig.java     # 客户端配置类
+│       └── SsoAuthInterceptor.java  # 认证拦截器
+├── src/main/resources/
+│   ├── application.yml              # 应用配置
+│   └── templates/                   # Thymeleaf模板
+│       ├── login.html               # SSO登录页面
+│       └── home.html                # 首页（受保护资源）
+└── pom.xml                          # Maven配置
+```
+
+### SSO 登录流程
+
+```
+1. 用户访问客户端系统（如 http://localhost:8006/）
+2. 客户端拦截器检测到用户未登录
+3. 重定向到 SSO Server 登录页面（/sso/login）
+4. 用户输入用户名密码（演示账号: admin/123456）
+5. SSO Server 验证凭据并签发 JWT 令牌
+6. SSO Server 重定向回客户端回调地址（/sso/callback），携带令牌
+7. 客户端调用 SSO Server 验证令牌有效性
+8. 验证通过后，客户端创建本地会话
+9. 用户成功访问受保护的资源
+```
+
+### API 接口列表
+
+#### SSO Server 接口
+
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/sso/login` | GET | 显示登录页面 |
+| `/sso/login` | POST | 处理登录请求 |
+| `/sso/api/login` | POST | RESTful 登录接口 |
+| `/sso/validate` | GET | 验证令牌有效性 |
+| `/sso/userinfo` | GET | 获取用户信息 |
+| `/sso/logout` | GET | 登出（使令牌失效） |
+
+#### SSO Client 接口
+
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/` | GET | 首页（受保护资源） |
+| `/sso/callback` | GET | SSO 回调接口 |
+| `/api/userinfo` | GET | 获取当前用户信息 |
+| `/logout` | GET | 本地登出 |
+| `/global-logout` | GET | 全局登出 |
+| `/simulate-login` | GET | 模拟其他模块登录 |
+| `/api/client-config` | GET | 获取客户端配置 |
+
+### 演示账号
+
+- **用户名**: `admin`
+- **密码**: `123456`
+
+### 启动方式
+
+```bash
+# 确保 Redis 已启动
+redis-server
+
+# 进入 sso-demo 目录
+cd sso-demo
+
+# 编译并启动
+mvn spring-boot:run
+```
+
+启动后访问: http://localhost:8006
+
+### Swagger 文档
+
+启动后访问: http://localhost:8006/swagger-ui.html
+
+### 模拟其他模块登录
+
+模块提供了模拟其他微服务模块通过 SSO 登录的功能：
+
+```bash
+# 模拟 user-service 登录
+curl "http://localhost:8006/simulate-login?system=user-service"
+
+# 模拟 order-service 登录
+curl "http://localhost:8006/simulate-login?system=order-service"
+
+# 模拟 goods-service 登录
+curl "http://localhost:8006/simulate-login?system=goods-service"
+```
+
+### 配置说明
+
+主要配置项（application.yml）：
+
+```yaml
+sso:
+  server:
+    url: http://localhost:8006          # SSO Server 地址
+    jwt-secret: sso-demo-jwt-secret-key  # JWT 签名密钥
+    token-expire-seconds: 7200           # 令牌过期时间（秒）
+    persist-token: true                  # 是否持久化令牌到 Redis
+  
+  client:
+    client-id: sso-demo-client           # 客户端 ID
+    client-secret: sso-demo-secret       # 客户端密钥
+    server-url: http://localhost:8006    # SSO Server 地址
+    callback-url: http://localhost:8006/sso/callback  # 回调地址
+    ignore-paths:                        # 白名单路径（不需要认证）
+      - /sso/login
+      - /sso/callback
+      - /swagger-ui/**
+```
 
 ## 常见问题
 
@@ -358,7 +452,7 @@ mvn clean install
 
 ## 贡献指南
 
-欢迎提交 Issue 和 Pull Request！
+欢迎提交 Issue 和 Pull Request。
 
 ## 许可证
 
