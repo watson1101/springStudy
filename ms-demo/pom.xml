@@ -26,6 +26,7 @@
         <module>multi-thread</module>
         <module>flink-demo1</module>
         <module>sso-demo</module>
+        <module>flowable-service</module>
     </modules>
 
 <properties>

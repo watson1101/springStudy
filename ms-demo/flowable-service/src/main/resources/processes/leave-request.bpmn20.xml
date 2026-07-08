@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd"
+             id="leave-request-definitions"
+             name="Leave Request Definitions"
+             targetNamespace="http://flowable.org/leave">
+
+    <process id="leaveRequest" name="请假申请流程" isExecutable="true">
+        <documentation>员工请假申请审批流程：员工提交请假申请 -&gt; 直属领导审批 -&gt; 部门经理审批 -&gt; HR归档</documentation>
+
+        <startEvent id="start" name="开始">
+            <extensionElements>
+                <flowable:formProperty id="employeeName" name="员工姓名" type="string" required="true"/>
+                <flowable:formProperty id="employeeId" name="员工ID" type="string" required="true"/>
+                <flowable:formProperty id="leaveType" name="请假类型" type="enum" required="true">
+                    <flowable:value id="annual" name="年假"/>
+                    <flowable:value id="sick" name="病假"/>
+                    <flowable:value id="personal" name="事假"/>
+                    <flowable:value id="maternity" name="产假"/>
+                </flowable:formProperty>
+                <flowable:formProperty id="startDate" name="开始日期" type="date" required="true"/>
+                <flowable:formProperty id="endDate" name="结束日期" type="date" required="true"/>
+                <flowable:formProperty id="days" name="请假天数" type="long" required="true"/>
+                <flowable:formProperty id="reason" name="请假原因" type="string" required="true"/>
+            </extensionElements>
+        </startEvent>
+
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="leaderApproval"/>
+
+        <userTask id="leaderApproval" name="直属领导审批">
+            <documentation>直属领导审批员工的请假申请</documentation>
+            <extensionElements>
+                <flowable:formProperty id="leaderComment" name="审批意见" type="string"/>
+                <flowable:formProperty id="approved" name="是否批准" type="boolean" required="true"/>
+                <flowable:assignee>${leader}</flowable:assignee>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow2" sourceRef="leaderApproval" targetRef="decision1"/>
+
+        <exclusiveGateway id="decision1" name="领导审批决策"/>
+
+        <sequenceFlow id="flow3" sourceRef="decision1" targetRef="managerApproval">
+            <conditionExpression xsi:type="tFormalExpression">${approved == true &amp;&amp; days &gt; 3}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow4" sourceRef="decision1" targetRef="hrArchive">
+            <conditionExpression xsi:type="tFormalExpression">${approved == true &amp;&amp; days &lt;= 3}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow5" sourceRef="decision1" targetRef="rejected">
+            <conditionExpression xsi:type="tFormalExpression">${approved == false}</conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="managerApproval" name="部门经理审批">
+            <documentation>部门经理审批超过3天的请假申请</documentation>
+            <extensionElements>
+                <flowable:formProperty id="managerComment" name="审批意见" type="string"/>
+                <flowable:formProperty id="approvedByManager" name="是否批准" type="boolean" required="true"/>
+                <flowable:assignee>${manager}</flowable:assignee>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow6" sourceRef="managerApproval" targetRef="decision2"/>
+
+        <exclusiveGateway id="decision2" name="经理审批决策"/>
+
+        <sequenceFlow id="flow7" sourceRef="decision2" targetRef="hrArchive">
+            <conditionExpression xsi:type="tFormalExpression">${approvedByManager == true}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow8" sourceRef="decision2" targetRef="rejected">
+            <conditionExpression xsi:type="tFormalExpression">${approvedByManager == false}</conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="hrArchive" name="HR归档">
+            <documentation>HR部门归档已批准的请假申请</documentation>
+            <extensionElements>
+                <flowable:formProperty id="archiveNumber" name="归档编号" type="string"/>
+                <flowable:assignee>${hr}</flowable:assignee>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow9" sourceRef="hrArchive" targetRef="endApproved"/>
+
+        <endEvent id="endApproved" name="审批通过"/>
+
+        <endEvent id="rejected" name="审批拒绝"/>
+
+    </process>
+
+</definitions>

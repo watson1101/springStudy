@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd"
+             id="expense-reimbursement-definitions"
+             name="Expense Reimbursement Definitions"
+             targetNamespace="http://flowable.org/expense">
+
+    <process id="expenseReimbursement" name="费用报销流程" isExecutable="true">
+        <documentation>员工费用报销流程：员工提交报销申请 -&gt; 财务审核 -&gt; 部门经理审批 -&gt; 财务付款</documentation>
+
+        <startEvent id="start" name="开始">
+            <extensionElements>
+                <flowable:formProperty id="applicantName" name="申请人姓名" type="string" required="true"/>
+                <flowable:formProperty id="applicantId" name="申请人ID" type="string" required="true"/>
+                <flowable:formProperty id="amount" name="报销金额" type="double" required="true"/>
+                <flowable:formProperty id="expenseType" name="费用类型" type="enum" required="true">
+                    <flowable:value id="travel" name="差旅费"/>
+                    <flowable:value id="entertainment" name="招待费"/>
+                    <flowable:value id="office" name="办公费"/>
+                    <flowable:value id="other" name="其他"/>
+                </flowable:formProperty>
+                <flowable:formProperty id="description" name="费用说明" type="string" required="true"/>
+                <flowable:formProperty id="receiptCount" name="票据数量" type="long"/>
+            </extensionElements>
+        </startEvent>
+
+        <sequenceFlow id="flow1" sourceRef="start" targetRef="financeAudit"/>
+
+        <userTask id="financeAudit" name="财务审核">
+            <documentation>财务人员审核报销票据的真实性和合规性</documentation>
+            <extensionElements>
+                <flowable:formProperty id="financeComment" name="审核意见" type="string"/>
+                <flowable:formProperty id="auditPassed" name="审核是否通过" type="boolean" required="true"/>
+                <flowable:assignee>${finance}</flowable:assignee>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow2" sourceRef="financeAudit" targetRef="decision1"/>
+
+        <exclusiveGateway id="decision1" name="财务审核决策"/>
+
+        <sequenceFlow id="flow3" sourceRef="decision1" targetRef="managerApproval">
+            <conditionExpression xsi:type="tFormalExpression">${auditPassed == true}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow4" sourceRef="decision1" targetRef="rejected">
+            <conditionExpression xsi:type="tFormalExpression">${auditPassed == false}</conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="managerApproval" name="部门经理审批">
+            <documentation>部门经理审批报销申请</documentation>
+            <extensionElements>
+                <flowable:formProperty id="managerComment" name="审批意见" type="string"/>
+                <flowable:formProperty id="managerApproved" name="是否批准" type="boolean" required="true"/>
+                <flowable:assignee>${manager}</flowable:assignee>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow5" sourceRef="managerApproval" targetRef="decision2"/>
+
+        <exclusiveGateway id="decision2" name="经理审批决策"/>
+
+        <sequenceFlow id="flow6" sourceRef="decision2" targetRef="financePayment">
+            <conditionExpression xsi:type="tFormalExpression">${managerApproved == true}</conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="flow7" sourceRef="decision2" targetRef="rejected">
+            <conditionExpression xsi:type="tFormalExpression">${managerApproved == false}</conditionExpression>
+        </sequenceFlow>
+
+        <userTask id="financePayment" name="财务付款">
+            <documentation>财务部门执行付款操作</documentation>
+            <extensionElements>
+                <flowable:formProperty id="paymentDate" name="付款日期" type="date"/>
+                <flowable:formProperty id="paymentMethod" name="付款方式" type="enum">
+                    <flowable:value id="bank" name="银行转账"/>
+                    <flowable:value id="cash" name="现金"/>
+                    <flowable:value id="wechat" name="微信"/>
+                    <flowable:value id="alipay" name="支付宝"/>
+                </flowable:formProperty>
+                <flowable:formProperty id="transactionNo" name="交易流水号" type="string"/>
+                <flowable:assignee>${finance}</flowable:assignee>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="flow8" sourceRef="financePayment" targetRef="end"/>
+
+        <endEvent id="end" name="流程结束"/>
+
+        <endEvent id="rejected" name="审批拒绝"/>
+
+    </process>
+
+</definitions>

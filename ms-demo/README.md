@@ -39,6 +39,9 @@
 - **JWT**: 0.12.5 (令牌认证)
 - **SSO**: 单点登录演示模块
 
+### 工作流引擎
+- **Flowable**: 7.0.1 (BPMN2.0业务流程管理)
+
 ## 项目结构
 
 ```
@@ -68,7 +71,8 @@ ms-demo/
 ├── etl/                             # 数据处理服务
 ├── multi-thread/                    # Java多线程验证模块
 ├── flink-demo1/                     # Flink流处理学习示例
-└── sso-demo/                        # SSO单点登录演示模块
+├── sso-demo/                        # SSO单点登录演示模块
+└── flowable-service/                # Flowable工作流演示模块
 ```
 
 ## 模块说明
@@ -84,6 +88,7 @@ ms-demo/
 | multi-thread | - | Java多线程技术验证模块 | - |
 | flink-demo1 | - | Flink流处理学习示例 | - |
 | sso-demo | 8006 | SSO单点登录演示模块 | `/sso-demo/swagger-ui/index.html` |
+| flowable-service | 8007 | Flowable工作流演示模块 | `/flowable-service/swagger-ui.html` |
 | common | - | 公共组件、工具类、通用配置 | - |
 
 ## 环境要求
@@ -288,6 +293,254 @@ mvn clean install
 8. **multi-thread**: 学习 Java 多线程技术
 9. **flink-demo1**: 学习 Flink 流处理框架
 10. **sso-demo**: 学习单点登录（SSO）原理与实现
+11. **flowable-service**: 学习 Flowable 工作流引擎与 BPMN2.0 流程定义
+
+## Flowable 工作流模块 (flowable-service)
+
+### 模块简介
+
+`flowable-service` 模块演示了基于 Flowable 引擎的业务流程管理（BPM）功能，包含两个典型的业务流程示例：
+
+- **请假申请流程**: 员工提交请假申请 -> 直属领导审批 -> 部门经理审批（超过3天）-> HR归档
+- **费用报销流程**: 员工提交报销申请 -> 财务审核 -> 部门经理审批 -> 财务付款
+
+通过该模块，可以学习如何使用 Flowable 引擎实现复杂的业务流程自动化。
+
+### 技术实现
+
+- **Flowable**: 7.0.1 版本，基于 Spring Boot 的流程引擎
+- **BPMN2.0**: 标准化的业务流程建模语言
+- **MySQL**: 数据库存储流程定义和运行时数据
+- **Spring MVC**: 提供 RESTful API 接口
+
+### 核心文件结构
+
+```
+flowable-service/
+├── src/main/java/msdemo/hong/com/flowableservice/
+│   ├── FlowableServiceApplication.java  # 启动类
+│   ├── controller/                       # 控制器层
+│   │   └── FlowableController.java       # 流程管理控制器
+│   ├── service/                          # 服务层
+│   │   └── FlowableService.java          # 流程服务类
+│   └── config/                           # 配置类
+│       └── FlowableConfig.java           # Flowable配置类
+├── src/main/resources/
+│   ├── application.yml                   # 应用配置
+│   └── processes/                        # 流程定义文件
+│       ├── leave-request.bpmn20.xml      # 请假申请流程
+│       └── expense-reimbursement.bpmn20.xml  # 费用报销流程
+└── pom.xml                               # Maven配置
+```
+
+### 流程定义说明
+
+#### 1. 请假申请流程 (leaveRequest)
+
+**流程节点**:
+- `开始` → 员工提交请假申请
+- `直属领导审批` → 直属领导审批请假申请
+- `领导审批决策` → 根据审批结果和请假天数决定流程走向
+  - 批准且 ≤3天 → HR归档
+  - 批准且 >3天 → 部门经理审批
+  - 拒绝 → 流程结束（审批拒绝）
+- `部门经理审批` → 部门经理审批超过3天的请假申请
+- `经理审批决策` → 根据审批结果决定流程走向
+  - 批准 → HR归档
+  - 拒绝 → 流程结束（审批拒绝）
+- `HR归档` → HR部门归档已批准的请假申请
+- `审批通过/审批拒绝` → 流程结束
+
+**流程变量**:
+| 变量名 | 类型 | 说明 |
+|--------|------|------|
+| employeeName | String | 员工姓名 |
+| employeeId | String | 员工ID |
+| leaveType | String | 请假类型（annual/sick/personal/maternity） |
+| startDate | String | 开始日期 |
+| endDate | String | 结束日期 |
+| days | Long | 请假天数 |
+| reason | String | 请假原因 |
+| leader | String | 直属领导（任务负责人） |
+| manager | String | 部门经理（任务负责人） |
+| hr | String | HR人员（任务负责人） |
+
+#### 2. 费用报销流程 (expenseReimbursement)
+
+**流程节点**:
+- `开始` → 员工提交报销申请
+- `财务审核` → 财务人员审核报销票据
+- `财务审核决策` → 根据审核结果决定流程走向
+  - 通过 → 部门经理审批
+  - 拒绝 → 流程结束（审批拒绝）
+- `部门经理审批` → 部门经理审批报销申请
+- `经理审批决策` → 根据审批结果决定流程走向
+  - 批准 → 财务付款
+  - 拒绝 → 流程结束（审批拒绝）
+- `财务付款` → 财务部门执行付款操作
+- `流程结束/审批拒绝` → 流程结束
+
+**流程变量**:
+| 变量名 | 类型 | 说明 |
+|--------|------|------|
+| applicantName | String | 申请人姓名 |
+| applicantId | String | 申请人ID |
+| amount | Double | 报销金额 |
+| expenseType | String | 费用类型（travel/entertainment/office/other） |
+| description | String | 费用说明 |
+| receiptCount | Long | 票据数量 |
+| finance | String | 财务人员（任务负责人） |
+| manager | String | 部门经理（任务负责人） |
+
+### API 接口列表
+
+#### 流程定义管理
+
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/api/flowable/process-definitions` | GET | 获取所有流程定义列表 |
+| `/api/flowable/process-definitions/{key}` | GET | 根据key获取流程定义详情 |
+| `/api/flowable/process-definitions/xml/{id}` | GET | 获取流程定义XML内容 |
+| `/api/flowable/deploy` | POST | 部署新的流程定义 |
+| `/api/flowable/deployments/{id}` | DELETE | 删除流程部署 |
+
+#### 流程实例管理
+
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/api/flowable/process-instances` | GET | 获取所有运行中的流程实例 |
+| `/api/flowable/process-instances/key/{key}` | GET | 根据流程定义key获取流程实例 |
+| `/api/flowable/process-instances/{id}` | GET | 获取流程实例详情 |
+| `/api/flowable/process-instances/{id}/variables` | GET | 获取流程实例变量 |
+| `/api/flowable/process-instances/{id}/variables` | PUT | 设置流程实例变量 |
+| `/api/flowable/process-instances/{id}/suspend` | PUT | 挂起流程实例 |
+| `/api/flowable/process-instances/{id}/activate` | PUT | 激活流程实例 |
+| `/api/flowable/start` | POST | 通用启动流程实例 |
+| `/api/flowable/start/leave-request` | POST | 启动请假申请流程 |
+| `/api/flowable/start/expense-reimbursement` | POST | 启动费用报销流程 |
+
+#### 任务管理
+
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/api/flowable/tasks/process-instance/{id}` | GET | 获取流程实例的任务列表 |
+| `/api/flowable/tasks/assignee/{user}` | GET | 获取个人待办任务 |
+| `/api/flowable/tasks/{id}` | GET | 获取任务详情 |
+| `/api/flowable/tasks/{id}/claim` | PUT | 认领任务 |
+| `/api/flowable/tasks/{id}/unclaim` | PUT | 取消认领任务 |
+| `/api/flowable/tasks/{id}/complete` | POST | 完成任务 |
+
+#### 历史查询
+
+| 接口 | 方法 | 描述 |
+|------|------|------|
+| `/api/flowable/history` | GET | 获取已结束的流程实例历史记录 |
+
+### 启动方式
+
+```bash
+# 1. 创建MySQL数据库
+mysql -u root -p123456 -e "CREATE DATABASE flowable DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+
+# 2. 确保MySQL服务已启动
+mysql -u root -p123456
+
+# 3. 进入 flowable-service 目录
+cd flowable-service
+
+# 4. 编译并启动
+mvn spring-boot:run
+```
+
+启动后访问: http://localhost:8007/flowable-service
+
+### Swagger 文档
+
+启动后访问: http://localhost:8007/flowable-service/swagger-ui.html
+
+### 使用示例
+
+#### 1. 启动请假申请流程
+
+```bash
+curl -X POST http://localhost:8007/flowable-service/api/flowable/start/leave-request \
+  -H "Content-Type: application/json" \
+  -d '{
+    "employeeName": "张三",
+    "employeeId": "EMP001",
+    "leaveType": "annual",
+    "startDate": "2026-07-15",
+    "endDate": "2026-07-17",
+    "days": 3,
+    "reason": "年假",
+    "leader": "leader001",
+    "manager": "manager001",
+    "hr": "hr001",
+    "businessKey": "LEAVE-2026-001"
+  }'
+```
+
+#### 2. 获取领导的待办任务
+
+```bash
+curl http://localhost:8007/flowable-service/api/flowable/tasks/assignee/leader001
+```
+
+#### 3. 领导审批（批准）
+
+```bash
+curl -X POST http://localhost:8007/flowable-service/api/flowable/tasks/{taskId}/complete \
+  -H "Content-Type: application/json" \
+  -d '{
+    "approved": true,
+    "leaderComment": "同意请假"
+  }'
+```
+
+#### 4. HR归档
+
+```bash
+curl -X POST http://localhost:8007/flowable-service/api/flowable/tasks/{taskId}/complete \
+  -H "Content-Type: application/json" \
+  -d '{
+    "archiveNumber": "ARCH-2026-001"
+  }'
+```
+
+### 配置说明
+
+主要配置项（application.yml）：
+
+```yaml
+server:
+  port: 8007
+  servlet:
+    context-path: /flowable-service
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/flowable?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
+    username: root
+    password: 123456
+
+flowable:
+  process:
+    database-schema-update: true                    # 自动更新数据库表结构
+    definition-location-prefix: classpath:/processes/  # 流程定义文件位置
+    async-executor-activate: false                  # 禁用异步执行器（演示环境）
+```
+
+### Flowable 数据库表说明
+
+Flowable 启动时会自动创建以下表：
+
+| 表名前缀 | 说明 |
+|----------|------|
+| ACT_RE_* | 流程定义相关表（Repository） |
+| ACT_RU_* | 运行时数据相关表（Runtime） |
+| ACT_HI_* | 历史数据相关表（History） |
+| ACT_ID_* | 身份认证相关表（Identity） |
+| ACT_GE_* | 通用数据表（General） |
 
 ## SSO 单点登录模块 (sso-demo)
 

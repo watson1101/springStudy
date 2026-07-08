@@ -1,0 +1,40 @@
+server:
+  port: 8007
+  servlet:
+    context-path: /flowable-service
+
+spring:
+  application:
+    name: flowable-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/flowable?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      idle-timeout: 30000
+      connection-timeout: 30000
+      max-lifetime: 1800000
+
+flowable:
+  process:
+    database-schema-update: true
+    definition-location-prefix: classpath:/processes/
+    async-executor-activate: false
+
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+logging:
+  level:
+    root: INFO
+    msdemo.hong.com.flowableservice: DEBUG
+    org.flowable: INFO
