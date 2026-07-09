@@ -215,7 +215,7 @@ public class SsoClientController {
      */
     @GetMapping("/global-logout")
     @Operation(summary = "全局登出", description = "清除本地会话并使SSO令牌失效")
-    public String globalLogout(HttpServletRequest request, HttpServletResponse response) {
+    public String globalLogout(HttpServletRequest request, HttpServletResponse response) throws IOException {
         log.info("处理全局登出");
         
         HttpSession session = request.getSession();

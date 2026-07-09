@@ -73,23 +73,7 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>run-flink-demo</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>exec</goal>
-                        </goals>
-                        <configuration>
-                            <executable>java</executable>
-                            <arguments>
-                                <argument>-cp</argument>
-                                <argument>${project.build.outputDirectory};${exec.classpath}</argument>
-                                <argument>msdemo.hong.com.flinkdemo1.FlinkDemoRunner</argument>
-                            </arguments>
-                        </configuration>
-                    </execution>
-                </executions>
+                
             </plugin>
         </plugins>
     </build>

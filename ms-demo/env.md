@@ -1,3 +1,10 @@
+
+服务器：
+ubuntu 22.04.3 LTS
+地址：localhost
+用户名：hong
+密码：123456
+
 mysql:
 localhost:3306
 用户名：root

@@ -355,3 +355,20 @@ msdemo.hong.com.flinkdemo1
 - **Scala**: 2.12
 - **Kafka Connector**: 3.2.0-1.18
 - **JDK**: 21
+---
+
+## exec-maven-plugin 说明
+
+`pom.xml` 中配置了 `exec-maven-plugin`，但 **未绑定任何生命周期阶段**，因此 `mvn package` 或 `mvn compile` 时不会自动执行。
+
+如需手动运行任意演示，使用以下命令格式：
+
+```bash
+mvn exec:java -pl flink-demo1 `
+  -Dexec.mainClass="msdemo.hong.com.flinkdemo1.FlinkDemoRunner" `
+  -Dexec.args="batch"
+```
+
+参数 `exec.args` 可选值：`batch`、`stream`、`window`、`kafka-source`、`kafka-sink`、`help`。
+
+> ⚠️ 注意：此插件仅供开发时快速运行使用。在生产环境部署时，应使用 `flink run` 命令将打包后的 JAR 提交到 Flink 集群。

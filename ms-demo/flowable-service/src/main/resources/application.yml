@@ -23,6 +23,7 @@ flowable:
   process:
     database-schema-update: true
     definition-location-prefix: classpath:/processes/
+    # 是否激活异步执行器
     async-executor-activate: false
 
 springdoc:
