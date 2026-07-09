@@ -18,6 +18,11 @@ PostgreSQL 数据库
 redis
 localhost:6379
 
+
+nacos
+用户名：nacos
+密码：nacos
+
 kafka:
 Broker 业务客户端：localhost:9092
 CONTROLLER 控制器内部通信端口：localhost:9093

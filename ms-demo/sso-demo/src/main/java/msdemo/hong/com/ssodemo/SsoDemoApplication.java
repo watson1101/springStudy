@@ -23,7 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 
  * <p>启动端口：8006</p>
  */
-@SpringBootApplication
+@SpringBootApplication(exclude = org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration.class)
 public class SsoDemoApplication {
 
     /**
