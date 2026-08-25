@@ -1,0 +1,60 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: ms-ds-system
+  profiles:
+    active: dev
+  # MySQL 数据源（连接 Ubuntu 服务器，库 ms_ds_sys_config）
+  datasource:
+    url: jdbc:mysql://192.168.0.27:3306/ms_ds_sys_config?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    nacos:
+      server-addr: 192.168.0.27:8848
+      discovery:
+        namespace: public
+        username: nacos
+        password: nacos
+      config:
+        import-check:
+          enabled: false
+
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  type-aliases-package: com.ms.learn.system.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+logging:
+  level:
+    com.ms.learn.system: debug
+
+# ============ A股资讯增量同步(binlog) 配置 ============
+# 源/目标连接信息; 开关 sync.a-stock.enabled 存于 sys_config 表(系统管理模块管理)
+sync:
+  a-stock:
+    # Mac 源库 binlog 连接
+    source:
+      host: 192.168.0.40
+      port: 3306
+      username: root
+      password: 123456
+      database: OPENCLAW_A_STOCK
+    # Ubuntu 目标库(默认用本服务数据源同库, 这里显式声明表同步的目标库)
+    target:
+      database: OPENCLAW_A_STOCK
+    # binlog 监听配置
+    listen:
+      server-id: 65530
+      chunk-size: 1000

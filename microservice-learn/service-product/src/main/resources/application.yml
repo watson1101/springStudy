@@ -1,0 +1,40 @@
+server:
+  port: 8003
+
+spring:
+  application:
+    name: service-product
+  profiles:
+    active: dev
+  # PostgreSQL 数据源（连接 Ubuntu 服务器，库 ms_ds_product）
+  datasource:
+    url: jdbc:postgresql://192.168.0.27:5432/ms_ds_product
+    username: postgres
+    password: 123456
+    driver-class-name: org.postgresql.Driver
+  cloud:
+    nacos:
+      server-addr: 192.168.0.27:8848
+      discovery:
+        namespace: public
+        username: nacos
+        password: nacos
+      config:
+        import-check:
+          enabled: false
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8858
+      eager: true
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+logging:
+  level:
+    com.ms.learn: debug

@@ -1,0 +1,18 @@
+# ms-ds-system 独立 compose 编排
+# 说明：复用现有外部 Nacos(192.168.0.27:8848, 已运行), 不重复启动 nacos 容器
+# 用途：以标准 compose 方式统一编排管理 ms-ds-system 服务
+# 启动：docker compose -f docker-compose.ms-ds-system.yml up -d --build
+version: "3.8"
+
+services:
+  ms-ds-system:
+    build:
+      context: .
+      dockerfile: ms-ds-system/Dockerfile
+    container_name: ms-ds-system
+    environment:
+      TZ: Asia/Shanghai
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8090:8090"
+    restart: unless-stopped
