@@ -18,6 +18,9 @@
         <module>service-order</module>
         <module>service-product</module>
         <module>ms-ds-system</module>
+        <module>flink-demo</module>
+        <module>flowable-service</module>
+        <module>multi-thread</module>
     </modules>
 
     <parent>
@@ -36,6 +39,9 @@
         <postgresql.version>42.7.3</postgresql.version>
         <lombok.version>1.18.38</lombok.version>
         <binlog-connector.version>0.29.2</binlog-connector.version>
+        <fastjson.version>1.2.83</fastjson.version>
+        <hutool.version>5.8.27</hutool.version>
+        <slf4j.version>2.0.13</slf4j.version>
     </properties>
 
     <dependencyManagement>
@@ -73,6 +79,26 @@
                 <groupId>com.zendesk</groupId>
                 <artifactId>mysql-binlog-connector-java</artifactId>
                 <version>${binlog-connector.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>fastjson</artifactId>
+                <version>${fastjson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-core</artifactId>
+                <version>${hutool.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

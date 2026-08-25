@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.hong</groupId>
-        <artifactId>ms-demo</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <groupId>com.ms.learn</groupId>
+        <artifactId>microservice-learn</artifactId>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>multi-thread</artifactId>
@@ -30,6 +30,11 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
+        </dependency>
+        <!-- SLF4J (Lombok @Slf4j 需要) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
 
