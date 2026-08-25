@@ -12,7 +12,7 @@ services:
       NACOS_AUTH_ENABLE: "true"
       NACOS_AUTH_IDENTITY_KEY: ms-learn-key
       NACOS_AUTH_IDENTITY_VALUE: ms-learn-secret
-      NACOS_AUTH_TOKEN: "123456"
+      NACOS_AUTH_TOKEN: "MSk5OWU4N2Y2ZWM0ZjVhY2IwMDU0MTAwMGJi"
     ports:
       - "8848:8848"
       - "9848:9848"
