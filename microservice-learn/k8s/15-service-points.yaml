@@ -1,0 +1,95 @@
+# ===================================================================
+# service-points: 积分服务
+#   端口 8005，ClusterIP 内部可见
+#   积分账户 + 流水 SQL
+# ===================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-points
+  namespace: ms-learn
+  labels:
+    app: service-points
+    tier: backend
+    part-of: ms-learn
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: service-points
+  template:
+    metadata:
+      labels:
+        app: service-points
+        tier: backend
+        part-of: ms-learn
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: service-points
+          image: localhost:5000/ms-learn/service-points:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8005
+              name: http
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://$(MYSQL_HOST):$(MYSQL_PORT)/ms_ds_points?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
+            - name: JAVA_OPTS
+              value: "-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError"
+          envFrom:
+            - configMapRef:
+                name: ms-learn-common
+            - secretRef:
+                name: ms-learn-secret
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8005
+            initialDelaySeconds: 25
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8005
+            initialDelaySeconds: 70
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # 理由：账户+流水 SQL 为主；档与 user 一致
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-points
+  namespace: ms-learn
+  labels:
+    app: service-points
+    part-of: ms-learn
+spec:
+  type: ClusterIP
+  selector:
+    app: service-points
+  ports:
+    - name: http
+      port: 8005
+      targetPort: http
+      protocol: TCP

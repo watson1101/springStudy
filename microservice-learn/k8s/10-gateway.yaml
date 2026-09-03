@@ -1,0 +1,100 @@
+# ===================================================================
+# ms-gateway: Spring Cloud Gateway
+#   端口 8000，对外 NodePort: 30080
+#   无状态，纯路由。内存占用低，requests/limits 偏小
+# ===================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-gateway
+  namespace: ms-learn
+  labels:
+    app: ms-gateway
+    tier: backend
+    part-of: ms-learn
+    app.kubernetes.io/part-of: ms-learn
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ms-gateway
+  template:
+    metadata:
+      labels:
+        app: ms-gateway
+        tier: backend
+        part-of: ms-learn
+    spec:
+      # 安全基线：以非 root 用户运行（需与 Dockerfile USER uid 对齐）
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: gateway
+          image: localhost:5000/ms-learn/gateway:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          env:
+            - name: JAVA_OPTS
+              # 与 cgroup 对齐：MaxRAMPercentage 占用 limits.memory (768Mi) 的 75%
+              value: "-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError"
+          envFrom:
+            - configMapRef:
+                name: ms-learn-common
+            - secretRef:
+                name: ms-learn-secret
+          # ---------- Probes (actuator) ----------
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8000
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8000
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # ---------- 资源 (理由：纯路由无状态，内存低) ----------
+          resources:
+            requests:
+              cpu: 200m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-gateway
+  namespace: ms-learn
+  labels:
+    app: ms-gateway
+    part-of: ms-learn
+spec:
+  # 对外入口：NodePort 30080 (http://192.168.0.27:30080)
+  type: NodePort
+  selector:
+    app: ms-gateway
+  ports:
+    - name: http
+      port: 8000
+      targetPort: http
+      protocol: TCP
+      nodePort: 30080

@@ -1,5 +1,6 @@
 package com.ms.learn.user.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
@@ -22,9 +23,14 @@ public class User implements Serializable {
 
     private String username;
 
+    @JsonIgnore
+    private String passwordHash;
+
     private String nickname;
 
     private String email;
+
+    private Boolean enabled;
 
     private LocalDateTime createTime;
 }

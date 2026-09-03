@@ -1,0 +1,88 @@
+# ===================================================================
+# ms-frontend: Vue3 + Element Plus 前端 (静态资源由 nginx 托管)
+#   端口 80 (nginx)，对外 NodePort: 30081
+#   nginx 内置 /api/ 反代到集群内部 ms-gateway:8000，解决浏览器 CORS
+# ===================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-frontend
+  namespace: ms-learn
+  labels:
+    app: ms-frontend
+    tier: frontend
+    part-of: ms-learn
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ms-frontend
+  template:
+    metadata:
+      labels:
+        app: ms-frontend
+        tier: frontend
+        part-of: ms-learn
+    spec:
+      # nginx:1.27-alpine 自带 uid=101 (nginx)，与该 runAsUser 对齐
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 101
+        fsGroup: 101
+      containers:
+        - name: frontend
+          image: localhost:5000/ms-learn/frontend:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+              name: http
+          # nginx 健康检查：nginx.conf 中定义了 location =/health
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 80
+            initialDelaySeconds: 15
+            periodSeconds: 15
+            timeoutSeconds: 2
+            failureThreshold: 3
+          # 理由：纯静态 nginx，极轻
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-frontend
+  namespace: ms-learn
+  labels:
+    app: ms-frontend
+    part-of: ms-learn
+spec:
+  type: NodePort
+  selector:
+    app: ms-frontend
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+      nodePort: 30081

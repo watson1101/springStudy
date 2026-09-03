@@ -1,0 +1,9 @@
+# ms-learn: 微服务学习平台 K8s 命名空间
+# 所有业务资源均放入该 namespace，便于资源配额、清理、隔离
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ms-learn
+  labels:
+    app.kubernetes.io/part-of: ms-learn
+    app.kubernetes.io/managed-by: kubectl

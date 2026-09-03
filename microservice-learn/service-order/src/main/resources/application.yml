@@ -12,16 +12,20 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import:
+      - optional:nacos:service-order.yaml
   cloud:
     nacos:
       server-addr: 192.168.0.27:8848
+      username: nacos
+      password: nacos
       discovery:
         namespace: public
-        username: nacos
-        password: nacos
       config:
-        import-check:
-          enabled: false
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
 
 mybatis-plus:
   configuration:

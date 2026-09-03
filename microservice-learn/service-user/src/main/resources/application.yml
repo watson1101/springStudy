@@ -6,22 +6,26 @@ spring:
     name: service-user
   profiles:
     active: dev
-  # PostgreSQL 数据源（连接 Ubuntu 服务器，库 ms_ds_user）
+  # MySQL 数据源（连接 Ubuntu 服务器，库 ms_ds_user；保留 PostgreSQL 依赖未移除，可按需切换）
   datasource:
-    url: jdbc:postgresql://192.168.0.27:5432/ms_ds_user
-    username: postgres
+    url: jdbc:mysql://192.168.0.27:3306/ms_ds_user?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
     password: 123456
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import:
+      - optional:nacos:service-user.yaml
   cloud:
     nacos:
       server-addr: 192.168.0.27:8848
+      username: nacos
+      password: nacos
       discovery:
         namespace: public
-        username: nacos
-        password: nacos
       config:
-        import-check:
-          enabled: false
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
 
 mybatis-plus:
   configuration:
@@ -30,6 +34,30 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: auto
+
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  timeout: 7200
+  active-timeout: 1800
+  is-concurrent: true
+  is-share: false
+  is-read-header: true
+  is-read-cookie: true
+  is-write-header: true
+  token-style: random-64
+  sso-server:
+    ticket-timeout: 300
+    home-route: /api/user/auth/me
+    allow-anon-client: false
+    is-check-sign: true
+    secret-key: ${SSO_SERVER_SECRET:dev-only-change-this-sso-server-secret}
+    clients:
+      microservice-frontend:
+        client: microservice-frontend
+        allow-url: ${SSO_FRONTEND_ALLOW_URL:http://localhost:5173/*,http://127.0.0.1:5173/*}
+        is-slo: true
+        secret-key: ${SSO_CLIENT_SECRET:dev-only-change-this-sso-client-secret}
 
 logging:
   level:

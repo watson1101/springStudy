@@ -21,6 +21,8 @@
         <module>flink-demo</module>
         <module>flowable-service</module>
         <module>multi-thread</module>
+        <module>service-transaction</module>
+        <module>service-points</module>
     </modules>
 
     <parent>
@@ -42,6 +44,7 @@
         <fastjson.version>1.2.83</fastjson.version>
         <hutool.version>5.8.27</hutool.version>
         <slf4j.version>2.0.13</slf4j.version>
+        <sa-token.version>1.46.0</sa-token.version>
     </properties>
 
     <dependencyManagement>
@@ -99,6 +102,16 @@
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-api</artifactId>
                 <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot4-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-sso</artifactId>
+                <version>${sa-token.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

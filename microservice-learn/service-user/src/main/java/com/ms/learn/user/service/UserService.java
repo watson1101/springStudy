@@ -1,14 +1,12 @@
 package com.ms.learn.user.service;
 
-import com.ms.learn.user.entity.User;
+import com.ms.learn.user.dto.UserProfile;
 
 import java.util.List;
 
 public interface UserService {
 
-    List<User> listAll();
+    List<UserProfile> listAll();
 
-    User getById(Long id);
-
-    User create(User user);
+    UserProfile getById(Long id);
 }

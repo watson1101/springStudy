@@ -1,0 +1,48 @@
+server:
+  port: 8005
+
+spring:
+  application:
+    name: service-points
+  profiles:
+    active: dev
+  # MySQL 数据源（连接 Ubuntu 服务器，库 ms_ds_points）
+  datasource:
+    url: jdbc:mysql://192.168.0.27:3306/ms_ds_points?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import:
+      - optional:nacos:service-points.yaml
+  cloud:
+    nacos:
+      server-addr: 192.168.0.27:8848
+      username: nacos
+      password: nacos
+      discovery:
+        namespace: public
+      config:
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+# 积分业务默认配置（可被 Nacos service-points.yaml 覆盖）
+points:
+  rule:
+    default-code: EARN_DEFAULT
+  earn:
+    # 若规则表中找不到匹配规则，则作为兜底的发放比例（1 = 每消费1分钱=1积分）
+    fallback-rate: 1
+
+logging:
+  level:
+    com.ms.learn: debug

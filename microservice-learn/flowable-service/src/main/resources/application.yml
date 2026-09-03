@@ -6,9 +6,11 @@ server:
 spring:
   application:
     name: flowable-service
-
+  config:
+    import:
+      - optional:nacos:flowable-service.yaml
   datasource:
-    url: jdbc:mysql://localhost:3306/flowable?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true
+    url: jdbc:mysql://192.168.0.27:3306/ms_ds_flowable?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&nullCatalogMeansCurrent=true&allowPublicKeyRetrieval=true&useSSL=false
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -18,13 +20,41 @@ spring:
       idle-timeout: 30000
       connection-timeout: 30000
       max-lifetime: 1800000
+  cloud:
+    nacos:
+      server-addr: 192.168.0.27:8848
+      username: nacos
+      password: nacos
+      discovery:
+        namespace: public
+      config:
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
 
 flowable:
   process:
     database-schema-update: true
     definition-location-prefix: classpath:/processes/
-    # 是否激活异步执行器
     async-executor-activate: false
+    history-level: audit
+  # 显式关闭其他 Flowable 子引擎的自动装配，避免无意义的初始化与类加载
+  idm:
+    enabled: false
+  event-registry:
+    enabled: false
+  content-storage:
+    enabled: false
+  form:
+    enabled: false
+  dmn:
+    enabled: false
+  cmmn:
+    enabled: false
+  job:
+    enabled: false
+  mail:
+    enabled: false
 
 springdoc:
   api-docs:

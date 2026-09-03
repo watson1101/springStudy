@@ -1,0 +1,40 @@
+server:
+  port: 8004
+
+spring:
+  application:
+    name: service-transaction
+  profiles:
+    active: dev
+  # MySQL 数据源（连接 Ubuntu 服务器，库 ms_ds_transaction）
+  datasource:
+    url: jdbc:mysql://192.168.0.27:3306/ms_ds_transaction?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import:
+      - optional:nacos:service-transaction.yaml
+  cloud:
+    nacos:
+      server-addr: 192.168.0.27:8848
+      username: nacos
+      password: nacos
+      discovery:
+        namespace: public
+      config:
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+logging:
+  level:
+    com.ms.learn: debug

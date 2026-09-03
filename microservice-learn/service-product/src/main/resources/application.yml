@@ -6,25 +6,29 @@ spring:
     name: service-product
   profiles:
     active: dev
-  # PostgreSQL 数据源（连接 Ubuntu 服务器，库 ms_ds_product）
+  # MySQL 数据源（连接 Ubuntu 服务器，库 ms_ds_product；保留 PostgreSQL 依赖未移除，可按需切换）
   datasource:
-    url: jdbc:postgresql://192.168.0.27:5432/ms_ds_product
-    username: postgres
+    url: jdbc:mysql://192.168.0.27:3306/ms_ds_product?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
     password: 123456
-    driver-class-name: org.postgresql.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import:
+      - optional:nacos:service-product.yaml
   cloud:
     nacos:
       server-addr: 192.168.0.27:8848
+      username: nacos
+      password: nacos
       discovery:
         namespace: public
-        username: nacos
-        password: nacos
       config:
-        import-check:
-          enabled: false
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
     sentinel:
       transport:
-        dashboard: 127.0.0.1:8858
+        dashboard: 192.168.0.27:30858
       eager: true
 
 mybatis-plus:

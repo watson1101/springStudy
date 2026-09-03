@@ -1,5 +1,5 @@
-# 基础设施：Nacos 注册/配置中心 + Sentinel 控制台
-# 用途：微服务学习项目，先起这套基础设施，再本地或容器起各微服务
+# 基础设施：Nacos 注册/配置中心
+# Sentinel 控制台已迁移到 K8s（NodePort 192.168.0.27:30858），如需恢复取消注释
 # 启动：docker compose up -d
 version: "3.8"
 
@@ -21,14 +21,14 @@ services:
       - nacos-logs:/home/nacos/logs
     restart: always
 
-  sentinel-dashboard:
-    image: bladex/sentinel-dashboard
-    container_name: ms-sentinel
-    environment:
-      JAVA_OPTS: "-Dserver.port=8858 -Dcsp.sentinel.dashboard.server=127.0.0.1:8858"
-    ports:
-      - "8858:8858"
-    restart: always
+  # sentinel-dashboard:
+  #   image: bladex/sentinel-dashboard
+  #   container_name: ms-sentinel
+  #   environment:
+  #     JAVA_OPTS: "-Dserver.port=8858 -Dcsp.sentinel.dashboard.server=127.0.0.1:8858"
+  #   ports:
+  #     - "8858:8858"
+  #   restart: always
 
 volumes:
   nacos-data:

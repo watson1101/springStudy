@@ -1,5 +1,6 @@
 # 忽略 Maven 构建产物与 IDE/系统文件
 target/
+.m2/
 *.class
 *.jar
 !.mvn/wrapper/maven-wrapper.jar
@@ -16,3 +17,6 @@ dist/
 
 # 日志
 *.log
+
+# K8s Secret 真实值（禁止提交）；仅保留 *.example.yaml
+k8s/02-app-secret.yaml

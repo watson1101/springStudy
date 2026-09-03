@@ -21,14 +21,16 @@ services:
       - nacos-logs:/home/nacos/logs
     restart: always
 
-  sentinel-dashboard:
-    image: bladex/sentinel-dashboard
-    container_name: ms-sentinel
-    environment:
-      JAVA_OPTS: "-Dserver.port=8858 -Dcsp.sentinel.dashboard.server=127.0.0.1:8858"
-    ports:
-      - "8858:8858"
-    restart: always
+  # Sentinel Dashboard 已迁移到 K8s（NodePort 192.168.0.27:30858）
+  # 如需恢复 Docker 版，取消注释即可
+  # sentinel-dashboard:
+  #   image: bladex/sentinel-dashboard
+  #   container_name: ms-sentinel
+  #   environment:
+  #     JAVA_OPTS: "-Dserver.port=8858 -Dcsp.sentinel.dashboard.server=127.0.0.1:8858"
+  #   ports:
+  #     - "8858:8858"
+  #   restart: always
 
   service-user:
     build:
@@ -78,6 +80,45 @@ services:
       SPRING_PROFILES_ACTIVE: docker
     ports:
       - "8090:8090"
+    depends_on:
+      - nacos
+    restart: always
+
+  flowable-service:
+    build:
+      context: .
+      dockerfile: flowable-service/Dockerfile
+    container_name: ms-flowable
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8007:8007"
+    depends_on:
+      - nacos
+    restart: always
+
+  service-transaction:
+    build:
+      context: .
+      dockerfile: service-transaction/Dockerfile
+    container_name: ms-transaction
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8004:8004"
+    depends_on:
+      - nacos
+    restart: always
+
+  service-points:
+    build:
+      context: .
+      dockerfile: service-points/Dockerfile
+    container_name: ms-points
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    ports:
+      - "8005:8005"
     depends_on:
       - nacos
     restart: always

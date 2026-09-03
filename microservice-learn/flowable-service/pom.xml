@@ -20,6 +20,21 @@
     </properties>
 
     <dependencies>
+        <!-- Nacos 服务注册/发现 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+        </dependency>
+        <!-- Nacos 配置中心 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
+        <!-- Spring Cloud LoadBalancer -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-loadbalancer</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -40,6 +55,36 @@
             <groupId>org.flowable</groupId>
             <artifactId>flowable-spring-boot-starter-process</artifactId>
             <version>${flowable.version}</version>
+            <exclusions>
+                <!--
+                  Flowable 7.x starter-process 会传递引入 event-registry 自动装配；
+                  EventRegistryAutoConfiguration 在 @ConditionalOnClass 解析过程中引用
+                  KafkaAutoConfiguration / JmsAutoConfiguration，若应用未带 kafka/spring-jms
+                  依赖就会在 Spring 容器刷新早期直接抛 ClassNotFoundException，导致启动失败。
+
+                  由于 flowable-spring-boot-autoconfigure.ProcessEngineAutoConfiguration
+                  在工厂方法里还会直接引用 EventRegistryEventConsumer 等 event-registry API，
+                  所以不能排除 API jar；仅排除 starter 与 impl，让 API 保留在 classpath，
+                  同时配合 application.yml 的 flowable.event-registry.enabled=false 关闭
+                  自动装配链路。
+                -->
+                <exclusion>
+                    <groupId>org.flowable</groupId>
+                    <artifactId>flowable-event-registry-spring-boot-starter</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.flowable</groupId>
+                    <artifactId>flowable-spring-boot-starter-event-registry</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.flowable</groupId>
+                    <artifactId>flowable-event-registry-spring</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.flowable</groupId>
+                    <artifactId>flowable-event-registry-impl</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
@@ -67,6 +112,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <!-- Spring Boot Actuator：提供 /actuator/health 供 K8s liveness/readinessProbe 探测 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
 

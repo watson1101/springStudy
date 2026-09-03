@@ -1,0 +1,102 @@
+# ===================================================================
+# ms-ds-system: 系统配置 + A股资讯同步
+#   端口 8090，ClusterIP 内部可见
+#   MyBatis 多库多表 + BinlogSyncRunner（默认通过 SYNC_A_STOCK_ENABLED=false 关闭）
+#   偏内存密集，资源档偏高
+# ===================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ms-ds-system
+  namespace: ms-learn
+  labels:
+    app: ms-ds-system
+    tier: backend
+    part-of: ms-learn
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: ms-ds-system
+  template:
+    metadata:
+      labels:
+        app: ms-ds-system
+        tier: backend
+        part-of: ms-learn
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: ms-ds-system
+          image: localhost:5000/ms-learn/ms-ds-system:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8090
+              name: http
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://$(MYSQL_HOST):$(MYSQL_PORT)/ms_ds_sys_config?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
+            - name: JAVA_OPTS
+              value: "-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError"
+            # Binlog 同步开关（ConfigMap 默认为 false；需要开启时先 scale --replicas=1 再覆盖为 true）
+            - name: SYNC_A_STOCK_ENABLED_FROM_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: ms-learn-common
+                  key: SYNC_A_STOCK_ENABLED
+          envFrom:
+            - configMapRef:
+                name: ms-learn-common
+            - secretRef:
+                name: ms-learn-secret
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8090
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8090
+            initialDelaySeconds: 80
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # 理由：MyBatis 多表+binlog（默认关）；比 user 档重
+          resources:
+            requests:
+              cpu: 300m
+              memory: 768Mi
+            limits:
+              cpu: 800m
+              memory: 1536Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ms-ds-system
+  namespace: ms-learn
+  labels:
+    app: ms-ds-system
+    part-of: ms-learn
+spec:
+  type: ClusterIP
+  selector:
+    app: ms-ds-system
+  ports:
+    - name: http
+      port: 8090
+      targetPort: http
+      protocol: TCP

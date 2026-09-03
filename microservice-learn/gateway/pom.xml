@@ -19,6 +19,11 @@
             <groupId>com.alibaba.cloud</groupId>
             <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
         </dependency>
+        <!-- Nacos 配置中心 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
+        </dependency>
         <!-- Spring Cloud Gateway（注意：不是 spring-boot-starter-web，5.x 用 webflux starter） -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -37,6 +42,11 @@
             <groupId>com.ms.learn</groupId>
             <artifactId>common</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <!-- Spring Boot Actuator：提供 /actuator/health 供 K8s liveness/readinessProbe 探测 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
     </dependencies>
 </project>
