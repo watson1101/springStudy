@@ -23,6 +23,7 @@
         <module>multi-thread</module>
         <module>service-transaction</module>
         <module>service-points</module>
+        <module>service-goods</module>
     </modules>
 
     <parent>
@@ -66,6 +67,11 @@
             <dependency>
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-spring-boot4-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-extension</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
             <dependency>

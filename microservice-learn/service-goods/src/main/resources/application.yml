@@ -1,0 +1,56 @@
+server:
+  port: 8006
+
+spring:
+  application:
+    name: service-goods
+  profiles:
+    active: dev
+  # MySQL 数据源（连接 Ubuntu 服务器，库 ms_ds_goods）
+  datasource:
+    url: jdbc:mysql://192.168.0.27:3306/ms_ds_goods?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  config:
+    import:
+      - optional:nacos:service-goods.yaml
+  cloud:
+    nacos:
+      server-addr: 192.168.0.27:8848
+      username: nacos
+      password: nacos
+      discovery:
+        namespace: public
+      config:
+        namespace: public
+        group: DEFAULT_GROUP
+        file-extension: yaml
+    sentinel:
+      transport:
+        dashboard: 192.168.0.27:30858
+      eager: true
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+
+# Sa-Token 鉴权（SSO 客户端模式，认证中心为 service-user:8001）
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  is-read-header: true
+  is-read-cookie: true
+  sso-client:
+    # SSO 认证中心地址（service-user）
+    auth-url: http://192.168.0.27:8001/sso/auth
+    is-slo: true
+    secret-key: ${SSO_CLIENT_SECRET:dev-only-change-this-sso-client-secret}
+
+logging:
+  level:
+    com.ms.learn: debug

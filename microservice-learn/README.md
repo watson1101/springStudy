@@ -3,7 +3,7 @@
 > **项目定位**：Spring Cloud Alibaba 微服务学习 & 练手工程（用户/订单/商品 + 系统配置中心 + 多中间件对照学习）
 >
 > **文档生成时间**：2026-09-03
-> **最后基于版本**：`com.ms.learn:microservice-learn:1.0.0`（根 pom.xml 9 个 Maven 子模块）
+> **最后基于版本**：`com.ms.learn:microservice-learn:1.0.0`（根 pom.xml 10 个 Maven 子模块）
 
 ---
 
@@ -43,8 +43,9 @@ microservice-learn/                     ← 根 POM (pom)
 ├── service-user/                       ← 用户 & SSO 中心（8001，PostgreSQL），含 Dockerfile
 ├── service-order/                      ← 订单服务（8002，MySQL + OpenFeign 调 user），含 Dockerfile
 ├── service-product/                    ← 商品服务（8003，PostgreSQL + Sentinel），含 Dockerfile
+├── service-goods/                      ← 商品管理服务（8006，MySQL + Nacos + Sentinel + Sa-Token + Feign 调字典），含 Dockerfile
 ├── ms-ds-system/                       ← 系统配置 + Binlog CDC（8090，MySQL），含 Dockerfile
-│   └── sql/                            ← sys_config 表 & A股 目标表 SQL
+│   └── sql/                            ← sys_config / sys_dict 表 & A股 目标表 SQL
 ├── flowable-service/                   ← Flowable 工作流（8007 /flowable-service，MySQL）
 │   └── src/main/resources/processes/   ← 请假 / 报销 BPMN20 XML
 ├── flink-demo/                         ← Flink 学习：WordCount / Window / Kafka Source-Sink
@@ -68,6 +69,7 @@ microservice-learn/                     ← 根 POM (pom)
 | service-user | service-user | 8001 | PostgreSQL `ms_ds_user` |
 | service-order | service-order | 8002 | MySQL `ms_ds_order` |
 | service-product | service-product | 8003 | PostgreSQL `ms_ds_product` |
+| service-goods | service-goods | 8006 | MySQL `ms_ds_goods`（分类字典在 ms-ds-system） |
 | ms-ds-system | ms-ds-system | 8090 | MySQL `ms_ds_sys_config` + `OPENCLAW_A_STOCK` (CDC 目标) |
 | flowable-service | flowable-service (当前未注册到 Nacos) | 8007 | MySQL `flowable` |
 
@@ -179,6 +181,7 @@ Gateway (/api/user|order|product/*  +  /sso/*)
 | 8001 | service-user | 可独立暴露调试 |
 | 8002 | service-order | 可独立暴露调试 |
 | 8003 | service-product | 可独立暴露调试 |
+| 8006 | service-goods | 商品管理（分类字典走 ms-ds-system） |
 | 8007 | flowable-service | 未纳入 compose，需手动启动；`/flowable-service` context-path |
 | 8090 | ms-ds-system | 系统配置 + CDC |
 | 8848 / 9848 | Nacos 控制台 / gRPC | 默认账号 `nacos/nacos`，URL：http://192.168.0.27:8848/nacos |
@@ -313,8 +316,10 @@ kubectl get pods -A # 期望 coredns / kube-flannel / kube-proxy 等系统 Pod R
 
 # ---- 4. 数据库准备 ----
 # 所有 ms_ds_* 库必须已在宿主机 MySQL (192.168.0.27:3306) 创建并导入表
-# 一键执行全部建库建表（含 ms_ds_user/order/product/transaction/points/flowable）：
+# 一键执行全部建库建表（含 ms_ds_user/order/product/transaction/points/flowable/goods）：
 for f in sql/ms_ds_*/init.sql; do mysql -uroot -p123456 < "$f"; done
+# ms-ds-system 的字典表（sys_dict/sys_dict_item）建在 ms_ds_sys_config 库：
+mysql -uroot -p123456 < ms-ds-system/sql/ms_ds_sys_config.sql
 ```
 
 ### 8.2 上传项目到服务器
@@ -351,7 +356,7 @@ chmod +x k8s/scripts/*.sh
 
 # 一键：mvn package -> docker build -> docker push
 bash k8s/scripts/build-push.sh
-# 成功后末尾会枚举 Registry 中 ms-learn/gateway, service-user, ..., frontend 共 9 个镜像
+# 成功后末尾会枚举 Registry 中 ms-learn/gateway, service-user, ..., frontend 共 10 个镜像
 ```
 
 常见失败 & 修复：

@@ -50,6 +50,7 @@ DEPLOYS=(
   service-product
   service-transaction
   service-points
+  service-goods
   ms-ds-system
   flowable-service
   ms-frontend

@@ -38,8 +38,8 @@ fi
 # ---------- 1. Deployment 2/2 ----------
 echo "[2/8] Deployment replicas/ready..."
 DEPLOYS=(ms-gateway service-user service-order service-product \
-         service-transaction service-points ms-ds-system \
-         flowable-service ms-frontend)
+         service-transaction service-points service-goods \
+         ms-ds-system flowable-service ms-frontend)
 for d in "${DEPLOYS[@]}"; do
   read -r DESIRED READY < <(kubectl -n ms-learn get deploy "${d}" -o jsonpath='{.spec.replicas} {.status.readyReplicas}')
   READY="${READY:-0}"
@@ -87,10 +87,11 @@ check_svc service-order   ClusterIP   ""    8002
 check_svc service-product ClusterIP   ""    8003
 check_svc service-transaction ClusterIP ""  8004
 check_svc service-points  ClusterIP   ""    8005
+check_svc service-goods   ClusterIP   ""    8006
 check_svc ms-ds-system    ClusterIP   ""    8090
 check_svc flowable-service ClusterIP  ""    8007
 
-# ---------- 4. Registry 镜像数量=9 ----------
+# ---------- 4. Registry 镜像数量>=10 ----------
 echo "[5/8] Registry 镜像..."
 if command -v jq >/dev/null 2>&1; then
   cnt=$(curl -fsS "http://${REGISTRY_ADDR}/v2/_catalog" | jq '[.repositories[] | select(startswith("ms-learn/"))] | length')
@@ -98,10 +99,10 @@ else
   cnt=$(curl -fsS "http://${REGISTRY_ADDR}/v2/_catalog" \
     | python3 -c 'import json,sys; print(sum(1 for r in json.load(sys.stdin).get("repositories",[]) if r.startswith("ms-learn/")))')
 fi
-if [ "${cnt}" -ge 9 ]; then
-  pass "私有 Registry ms-learn 镜像 >=9 (actual=${cnt})"
+if [ "${cnt}" -ge 10 ]; then
+  pass "私有 Registry ms-learn 镜像 >=10 (actual=${cnt})"
 else
-  fail "私有 Registry ms-learn 镜像数量不足: actual=${cnt}, expect>=9"
+  fail "私有 Registry ms-learn 镜像数量不足: actual=${cnt}, expect>=10"
 fi
 
 # ---------- 5. 外部调用网关 ----------

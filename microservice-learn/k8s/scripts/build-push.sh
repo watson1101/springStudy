@@ -48,7 +48,7 @@ cd "$(dirname "$0")/../.."
 PROOT=$(pwd)
 echo "      项目根目录: ${PROOT}"
 
-# ---- 2. Maven 打包（8 个 JAR 服务）----
+# ---- 2. Maven 打包（9 个 JAR 服务）----
 echo "[2/5] Maven 打包 JAR 模块（-pl xxx -am 同时构建 common 依赖）..."
 JAR_MODULES=(
   gateway
@@ -57,6 +57,7 @@ JAR_MODULES=(
   service-product
   service-transaction
   service-points
+  service-goods
   ms-ds-system
   flowable-service
 )
@@ -69,8 +70,8 @@ PL_ARGS="${PL_ARGS#,}"  # 去掉开头逗号
 mvn -q -pl "${PL_ARGS}" -am clean package -DskipTests -Dmaven.test.skip=true -T 1C
 echo "      打包完成"
 
-# ---- 3. Docker build + push：8 个 JAR 服务 ----
-echo "[3/5] 构建并推送 JAR 镜像（8）..."
+# ---- 3. Docker build + push：9 个 JAR 服务 ----
+echo "[3/5] 构建并推送 JAR 镜像（9）..."
 build_jar() {
   local mod="$1"; shift
   local tag="${IMG_PREFIX}/${mod}:${VERSION}"

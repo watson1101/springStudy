@@ -1,6 +1,7 @@
 # 忽略 Maven 构建产物与 IDE/系统文件
 target/
 .m2/
+.mvn-settings.xml
 /META-INF/
 *.class
 *.jar

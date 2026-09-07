@@ -1,0 +1,95 @@
+# ===================================================================
+# service-goods: 商品管理服务
+#   端口 8006，ClusterIP 内部可见
+#   依赖 ms-ds-system（Feign 调字典）+ service-user（Sa-Token SSO）
+# ===================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-goods
+  namespace: ms-learn
+  labels:
+    app: service-goods
+    tier: backend
+    part-of: ms-learn
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: service-goods
+  template:
+    metadata:
+      labels:
+        app: service-goods
+        tier: backend
+        part-of: ms-learn
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: service-goods
+          image: localhost:5000/ms-learn/service-goods:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8006
+              name: http
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://$(MYSQL_HOST):$(MYSQL_PORT)/ms_ds_goods?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
+            - name: JAVA_OPTS
+              value: "-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError"
+          envFrom:
+            - configMapRef:
+                name: ms-learn-common
+            - secretRef:
+                name: ms-learn-secret
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8006
+            initialDelaySeconds: 25
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8006
+            initialDelaySeconds: 70
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          # 理由：SQL 为主；Sentinel client + Sa-Token + Feign 额外占少量内存
+          resources:
+            requests:
+              cpu: 200m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-goods
+  namespace: ms-learn
+  labels:
+    app: service-goods
+    part-of: ms-learn
+spec:
+  type: ClusterIP
+  selector:
+    app: service-goods
+  ports:
+    - name: http
+      port: 8006
+      targetPort: http
+      protocol: TCP
