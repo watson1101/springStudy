@@ -56,6 +56,19 @@ logging:
     com.ms.learn: debug
     org.apache.rocketmq: info
 
+# 异常日志开关（本地默认值；Nacos 的 service-hotnews-consumer.yaml 可远程覆盖并动态刷新）
+exception-log:
+  enabled: true          # 总开关
+  file:
+    enabled: true        # 写文件
+    path: /app/logs/exception   # 容器内路径，由 k8s volume 挂载到宿主机
+    file-name: exception.log
+    max-history: 30
+  db:
+    enabled: true        # 落库（表名固定 exception_log）
+  alert:
+    enabled: false       # 告警开关（预留扩展，暂不处理）
+
 management:
   endpoints:
     web:
