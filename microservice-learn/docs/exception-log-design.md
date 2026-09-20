@@ -56,6 +56,7 @@ exception-log:
     path: /app/logs/exception  # 容器内路径（须挂载宿主机）
     file-name: exception.log
     max-history: 30
+    max-file-size-mb: 100      # 单文件大小上限(MB)，超过即滚动生成新文件
   db:
     enabled: true              # 落库，默认开启（表名固定 exception_log）
   alert:

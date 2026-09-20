@@ -10,17 +10,20 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 /**
  * 异常日志记录器 —— 按配置把异常写入「文件」和/或「数据库」。
  * <p>文件路径部署时须挂载到宿主机目录，避免只留在容器内。</p>
+ * <p>单个文件超过 maxFileSizeMb 时自动滚动，主文件重新开始写。</p>
  */
 @Slf4j
 @Component
 public class ExceptionLogRecorder {
 
     private static final DateTimeFormatter FILE_TS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final DateTimeFormatter ROLL_TS = DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss-SSS");
 
     private final ExceptionLogProperties properties;
     private final ExceptionLogDbWriter dbWriter;
@@ -55,7 +58,7 @@ public class ExceptionLogRecorder {
         try {
             Path dir = Paths.get(properties.getFile().getPath());
             Files.createDirectories(dir);
-            Path file = dir.resolve(properties.getFile().getFileName());
+            Path file = resolveActiveFile(dir);
             String line = buildFileLine(e);
             Files.write(file, line.getBytes(StandardCharsets.UTF_8),
                     StandardOpenOption.CREATE, StandardOpenOption.APPEND);
@@ -63,6 +66,29 @@ public class ExceptionLogRecorder {
             // 文件写失败不影响落库与业务
             log.warn("[exception-log] 写入异常日志文件失败: {}", ex.getMessage());
         }
+    }
+
+    /**
+     * 解析当前应写入的文件：未超限用主文件；达到上限则把主文件归档为带时间戳的文件，
+     * 主文件重新开始写入。
+     */
+    private Path resolveActiveFile(Path dir) throws IOException {
+        String baseName = properties.getFile().getFileName();
+        Path main = dir.resolve(baseName);
+        long maxBytes = properties.getFile().getMaxFileSizeMb() * 1024L * 1024L;
+
+        if (!Files.exists(main)) {
+            return main;
+        }
+        if (maxBytes <= 0 || Files.size(main) < maxBytes) {
+            return main;
+        }
+        String stamp = LocalDateTime.now().format(ROLL_TS);
+        Path archived = dir.resolve(baseName + "." + stamp);
+        Files.move(main, archived);
+        log.info("[exception-log] 日志文件已达 {}MB 上限，已滚动为 {}",
+                properties.getFile().getMaxFileSizeMb(), archived.getFileName());
+        return main;
     }
 
     private String buildFileLine(ExceptionLog e) {

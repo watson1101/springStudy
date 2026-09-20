@@ -33,6 +33,8 @@ public class ExceptionLogProperties {
         private String fileName = "exception.log";
         /** 保留天数 */
         private int maxHistory = 30;
+        /** 单个文件大小上限（MB），超过即滚动生成新文件，默认 100 */
+        private long maxFileSizeMb = 100;
     }
 
     @Data
