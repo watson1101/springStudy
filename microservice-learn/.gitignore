@@ -23,3 +23,5 @@ dist/
 
 # K8s Secret 真实值（禁止提交）；仅保留 *.example.yaml
 k8s/02-app-secret.yaml
+k8s/*-secret.yaml
+!k8s/*-secret.example.yaml

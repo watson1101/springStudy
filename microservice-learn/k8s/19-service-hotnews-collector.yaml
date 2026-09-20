@@ -1,0 +1,89 @@
+# ===================================================================
+# service-hotnews-collector: 热点资讯采集服务
+#   端口 8008，定时抓取头条热榜 → 投递 RocketMQ
+#   仅 1 副本（定时任务避免重复采集）
+#   Cron 由 Nacos 动态配置：service-hotnews-collector.yaml
+# ===================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-hotnews-collector
+  namespace: ms-learn
+  labels:
+    app: service-hotnews-collector
+    tier: backend
+    part-of: ms-learn
+    app.kubernetes.io/part-of: ms-learn
+spec:
+  # 定时采集任务：单副本，避免多副本重复采集
+  replicas: 1
+  revisionHistoryLimit: 5
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: service-hotnews-collector
+  template:
+    metadata:
+      labels:
+        app: service-hotnews-collector
+        tier: backend
+        part-of: ms-learn
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: service-hotnews-collector
+          image: localhost:5000/ms-learn/service-hotnews-collector:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8008
+              name: http
+          env:
+            - name: JAVA_OPTS
+              value: "-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError"
+            - name: SPRING_CLOUD_NACOS_SERVER_ADDR
+              value: "192.168.0.27:8848"
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8008
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8008
+            initialDelaySeconds: 80
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 100m
+              memory: 384Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-hotnews-collector
+  namespace: ms-learn
+  labels:
+    app: service-hotnews-collector
+    part-of: ms-learn
+spec:
+  type: ClusterIP
+  selector:
+    app: service-hotnews-collector
+  ports:
+    - name: http
+      port: 8008
+      targetPort: http
+      protocol: TCP

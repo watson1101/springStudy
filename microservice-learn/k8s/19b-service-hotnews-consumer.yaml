@@ -1,0 +1,103 @@
+# ===================================================================
+# service-hotnews-consumer: 热点资讯消费服务
+#   端口 8009，消费 RocketMQ 热榜消息 → 写入 MySQL ms_ds_hotnews
+#   消费组 hotnews-consumer-group（集群消费，可多副本）
+# ===================================================================
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service-hotnews-consumer
+  namespace: ms-learn
+  labels:
+    app: service-hotnews-consumer
+    tier: backend
+    part-of: ms-learn
+    app.kubernetes.io/part-of: ms-learn
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: service-hotnews-consumer
+  template:
+    metadata:
+      labels:
+        app: service-hotnews-consumer
+        tier: backend
+        part-of: ms-learn
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: service-hotnews-consumer
+          image: localhost:5000/ms-learn/service-hotnews-consumer:1.0.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8009
+              name: http
+          env:
+            - name: JAVA_OPTS
+              value: "-XX:MaxRAMPercentage=75.0 -XX:+UseG1GC -XX:+ExitOnOutOfMemoryError"
+            - name: SPRING_CLOUD_NACOS_SERVER_ADDR
+              value: "192.168.0.27:8848"
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://192.168.0.27:3306/ms_ds_hotnews?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true"
+            # 凭据从 Secret 注入（真实值不入库；本地/集群另行创建 hotnews-db-secret）
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: hotnews-db-secret
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: hotnews-db-secret
+                  key: password
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8009
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 3
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8009
+            initialDelaySeconds: 80
+            periodSeconds: 20
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: 200m
+              memory: 384Mi
+            limits:
+              cpu: 600m
+              memory: 1024Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-hotnews-consumer
+  namespace: ms-learn
+  labels:
+    app: service-hotnews-consumer
+    part-of: ms-learn
+spec:
+  type: ClusterIP
+  selector:
+    app: service-hotnews-consumer
+  ports:
+    - name: http
+      port: 8009
+      targetPort: http
+      protocol: TCP
