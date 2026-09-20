@@ -37,7 +37,7 @@
 ```
 microservice-learn/                     ← 根 POM (pom)
 ├── pom.xml                             ← 父 POM，统一依赖版本
-├── common/                             ← 公共包：Result 统一返回、BizException
+├── common/                             ← 公共包：Result 统一返回、BizException、全局异常捕获+异常日志（详见 common/README.md）
 ├── gateway/                            ← Spring Cloud Gateway（8000），含 Dockerfile
 │   └── src/main/resources/application.yml
 ├── service-user/                       ← 用户 & SSO 中心（8001，PostgreSQL），含 Dockerfile
@@ -77,7 +77,7 @@ microservice-learn/                     ← 根 POM (pom)
 
 | 模块 | 性质 | 说明 |
 |------|------|------|
-| common | 依赖库 (jar) | 统一响应 `Result`、业务异常 `BizException`；其他模块通过 `com.ms.learn:common:${project.version}` 依赖 |
+| common | 依赖库 (jar) | 统一响应 `Result`、业务异常 `BizException`、**全局异常捕获 + 异常日志（文件/数据库双写，2026-09-21 新增）**；其他模块通过 `com.ms.learn:common:${project.version}` 依赖，详见 `common/README.md` |
 | flink-demo | 学习示例 (jar) | Flink 基础/窗口/Kafka 接入演示，独立 `run.bat` / `main()` 启动，不进主 compose |
 | multi-thread | 学习示例 (jar) | Java 并发基础、同步、阻塞队列、线程池、CompletableFuture、CountDownLatch 等 |
 | flowable-service | 准业务服务 (jar) | 工作流流程定义（请假/报销），含 Swagger UI；目前数据源走 `localhost:3306`、未接入 Nacos，独立启动 |
@@ -219,6 +219,7 @@ Gateway (/api/user|order|product/*  +  /sso/*)
 | ✅ CDC | 自研 Binlog 监听 + 可热配置启停，练习 "日志型 ETL" 思维 |
 | ✅ 工作流 | Flowable 提供 BPMN 可视化能力，下一练习：与订单服务联动（下单 → 审批流） |
 | ✅ 前端联动 | Vue 3 四页 SPA，练习 "前端→网关→微服务→DB" 完整闭环 |
+| ✅ 全局异常处理 | common 统一提供异常捕获 + 异常日志（文件/数据库双写，开关默认全开）；服务依赖 common 即生效，无需逐服务改代码 |
 | ✅ 容器化 | 所有核心模块含 Dockerfile；full compose 支持一把梭全量启动 |
 | 🚀 进阶方向 K8s | flannel + cni0 已就绪，下一练习：helm/kubectl 把 core services 从 compose 迁入 K8s Deployment + Service + Ingress |
 
@@ -440,6 +441,10 @@ kubectl -n ms-learn scale deploy ms-ds-system --replicas=1
 
 ## 九、相关文档
 
+- 公共模块说明（含全局异常捕获与异常日志）：仓库内 `common/README.md`
+- 异常日志设计说明：仓库内 `docs/exception-log-design.md`
+- 异常日志建表脚本：仓库内 `sql/exception_log.sql`
+- 热点资讯模块设计：仓库内 `docs/hotnews-design.md`
 - 测试服务器 Kafka 部署说明：服务器上 `/home/hong/Documents/KAFKA_DEPLOYMENT.md`
 - Sentinel K8s 部署（NodePort 30858）：仓库内 `SENTINEL_K8S_DEPLOY.md`
 - 数据库脚本：仓库内 `sql/*.sql`、`sql/ms_ds_*/init.sql`
