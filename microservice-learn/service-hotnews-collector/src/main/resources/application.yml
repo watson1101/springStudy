@@ -12,8 +12,9 @@ spring:
   cloud:
     nacos:
       server-addr: 192.168.0.27:8848
+      # 真实值优先取环境变量；未注入时回退到默认值
       username: ${NACOS_USERNAME:nacos}
-      password: ${NACOS_PASSWORD:}
+      password: ${NACOS_PASSWORD:nacos}
       discovery:
         namespace: public
       config:
