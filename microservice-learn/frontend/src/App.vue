@@ -11,8 +11,14 @@
       >
         <el-menu-item index="/">📋 架构总览</el-menu-item>
         <el-menu-item index="/users">👤 用户服务</el-menu-item>
-        <el-menu-item index="/orders">📦 订单服务</el-menu-item>
+        <el-menu-item index="/orders">🧾 订单服务</el-menu-item>
         <el-menu-item index="/products">🛒 商品服务</el-menu-item>
+        <el-menu-item index="/goods">📦 商品管理</el-menu-item>
+        <el-menu-item index="/points">🎁 积分服务</el-menu-item>
+        <el-menu-item index="/payments">💳 支付服务</el-menu-item>
+        <el-menu-item index="/hotnews">🔥 热点资讯</el-menu-item>
+        <el-menu-item index="/system">⚙️ 系统配置</el-menu-item>
+        <el-menu-item index="/flowable">🔄 工作流</el-menu-item>
       </el-menu>
     </el-aside>
     <el-container>

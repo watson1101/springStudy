@@ -18,58 +18,93 @@ spring:
         namespace: public
         group: DEFAULT_GROUP
         file-extension: yaml
+    # ===================================================================
+    # 网关路由配置前缀（重要）
+    # Spring Cloud Gateway 5.x（spring-cloud-gateway-server-webflux 5.0.3）
+    # 已将 GatewayProperties 前缀从 spring.cloud.gateway 改为
+    # spring.cloud.gateway.server.webflux。
+    # 若沿用旧前缀，路由不会被加载（日志显示 New routes count: 0）。
+    # ===================================================================
     gateway:
-      routes:
-        - id: service-user
-          uri: lb://service-user
-          predicates:
-            - Path=/api/user/**
-          filters:
-            - StripPrefix=0
-        - id: service-user-sso
-          uri: lb://service-user
-          predicates:
-            - Path=/sso/**
-          filters:
-            - StripPrefix=0
-        - id: service-order
-          uri: lb://service-order
-          predicates:
-            - Path=/api/order/**
-          filters:
-            - StripPrefix=0
-        - id: service-product
-          uri: lb://service-product
-          predicates:
-            - Path=/api/product/**
-          filters:
-            - StripPrefix=0
-        - id: service-transaction
-          uri: lb://service-transaction
-          predicates:
-            - Path=/api/payment/**
-          filters:
-            - StripPrefix=0
-        - id: service-points
-          uri: lb://service-points
-          predicates:
-            - Path=/api/points/**
-          filters:
-            - StripPrefix=0
-        - id: service-goods
-          uri: lb://service-goods
-          predicates:
-            - Path=/api/goods/**
-          filters:
-            - StripPrefix=0
-      globalcors:
-        add-to-simple-url-handler-mapping: true
-        cors-configurations:
-          '[/**]':
-            allowedOriginPatterns: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
-            allowCredentials: true
+      server:
+        webflux:
+          routes:
+            - id: service-user
+              uri: lb://service-user
+              predicates:
+                - Path=/api/user/**
+              filters:
+                - StripPrefix=0
+            - id: service-user-sso
+              uri: lb://service-user
+              predicates:
+                - Path=/sso/**
+              filters:
+                - StripPrefix=0
+            - id: service-order
+              uri: lb://service-order
+              predicates:
+                - Path=/api/order/**
+              filters:
+                - StripPrefix=0
+            - id: service-product
+              uri: lb://service-product
+              predicates:
+                - Path=/api/product/**
+              filters:
+                - StripPrefix=0
+            - id: service-transaction
+              uri: lb://service-transaction
+              predicates:
+                - Path=/api/payment/**
+              filters:
+                - StripPrefix=0
+            - id: service-points
+              uri: lb://service-points
+              predicates:
+                - Path=/api/points/**
+              filters:
+                - StripPrefix=0
+            - id: service-goods
+              uri: lb://service-goods
+              predicates:
+                - Path=/api/goods/**
+              filters:
+                - StripPrefix=0
+            - id: ms-ds-system
+              uri: lb://ms-ds-system
+              predicates:
+                - Path=/api/system/**
+              filters:
+                - StripPrefix=0
+            - id: flowable-service
+              uri: lb://flowable-service
+              predicates:
+                - Path=/api/flowable/**
+              filters:
+                - StripPrefix=0
+            # 热点资讯：采集端与消费端共用 /api/hotnews 前缀，
+            # 网关按声明顺序匹配，采集端（collect/config）必须排在消费端之前。
+            - id: service-hotnews-collector
+              uri: lb://service-hotnews-collector
+              predicates:
+                - Path=/api/hotnews/collect,/api/hotnews/config
+              filters:
+                - StripPrefix=0
+            - id: service-hotnews-consumer
+              uri: lb://service-hotnews-consumer
+              predicates:
+                - Path=/api/hotnews/**
+              filters:
+                - StripPrefix=0
+          globalcors:
+            add-to-simple-url-handler-mapping: true
+            cors-configurations:
+              '[/**]':
+                allowedOriginPatterns: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+                allowCredentials: true
 
 logging:
   level:

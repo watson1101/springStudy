@@ -37,7 +37,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: ms-ds-system
-          image: localhost:5000/ms-learn/ms-ds-system:1.0.0
+          image: localhost:5000/ms-learn/ms-ds-system:1.0.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8090

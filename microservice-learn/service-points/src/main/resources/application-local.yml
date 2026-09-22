@@ -1,0 +1,17 @@
+# 本机（Mac mini 192.168.0.40）调试专用 profile
+#
+# 用途：在 Mac 上启动该服务，并与测试服务器 k3s 中的同名服务并行注册到同一 Nacos。
+# 关键点：显式指定注册 IP 为 192.168.0.40。
+#   - Nacos 自动探测本机 IP 时可能选中 Docker/虚拟网卡地址（如 172.x），
+#     k3s Pod 无法路由回该地址，网关转发会失败。
+#   - 显式写死局域网 IP 后，网关 lb:// 轮询到本机实例时可直接访问。
+#
+# 启动方式：
+#   mvn -pl service-points spring-boot:run -Dspring-boot.run.profiles=local
+#   或 java -jar service-points/target/service-points-1.0.0.jar --spring.profiles.active=local
+spring:
+  cloud:
+    nacos:
+      discovery:
+        ip: 192.168.0.40
+        port: 8005

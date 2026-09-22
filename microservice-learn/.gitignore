@@ -25,3 +25,8 @@ dist/
 k8s/02-app-secret.yaml
 k8s/*-secret.yaml
 !k8s/*-secret.example.yaml
+
+# 编辑备份文件（.*.bak / *.bakN / *.bak-<时间戳>）
+*.bak
+*.bak[0-9]*
+*.bak-*
