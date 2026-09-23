@@ -89,6 +89,8 @@ ExceptionLogRecorder      统一记录（双写，两路互不影响）
 | 异常 | 处理 |
 |------|------|
 | `BizException` | 按自带 code 返回，**不落日志** |
+| `NotLoginException` | 401「请先登录」，**不落日志** |
+| `NotPermissionException` | 403「没有访问权限」，**不落日志** |
 | `IllegalArgumentException` | 400 + 落日志 |
 | `Exception`（兜底） | 500「系统繁忙，请稍后重试」+ 落日志 |
 

@@ -12,6 +12,11 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 192.168.0.27
+      port: 6379
+      timeout: 5s
   config:
     import:
       - optional:nacos:ms-ds-system.yaml
@@ -43,6 +48,18 @@ mybatis-plus:
 logging:
   level:
     com.ms.learn.system: debug
+
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  timeout: 7200
+  active-timeout: 1800
+  is-concurrent: true
+  is-share: false
+  is-read-header: true
+  is-read-cookie: true
+  is-write-header: true
+  token-style: random-64
 
 # ============ A股资讯增量同步(binlog) 配置 ============
 # 源/目标连接信息; 开关 sync.a-stock.enabled 存于 sys_config 表(系统管理模块管理)

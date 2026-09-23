@@ -1,5 +1,6 @@
 package com.ms.learn.order.service.impl;
 
+import com.ms.learn.common.exception.BizException;
 import com.ms.learn.common.result.Result;
 import com.ms.learn.order.entity.Order;
 import com.ms.learn.order.feign.UserFeignClient;
@@ -31,10 +32,10 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Order create(Order order, Long userId) {
-        // 通过 OpenFeign 调用户服务，校验用户存在
-        Result<com.ms.learn.common.result.Result<java.util.Map<String, Object>>> result =
-                (Result<com.ms.learn.common.result.Result<java.util.Map<String, Object>>>) (Object) userFeignClient.getUser(userId);
-        log.info("调用用户服务返回: {}", result);
+        Result<Boolean> result = userFeignClient.userExists(userId);
+        if (!Integer.valueOf(200).equals(result.getCode()) || !Boolean.TRUE.equals(result.getData())) {
+            throw new BizException(404, "用户不存在: " + userId);
+        }
 
         order.setUserId(userId);
         order.setOrderNo("ORD" + UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase());

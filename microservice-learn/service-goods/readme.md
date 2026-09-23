@@ -16,7 +16,7 @@
 | MySQL | 数据库 `ms_ds_goods` |
 | Nacos | 注册中心 + 配置中心 |
 | Sentinel | 熔断/限流 |
-| Sa-Token | 鉴权（SSO 客户端，认证中心为 service-user） |
+| Sa-Token | 登录校验（共享 Redis 会话） |
 | OpenFeign | 调用 ms-ds-system 数据字典 |
 
 ## 服务信息
@@ -63,6 +63,13 @@ CREATE TABLE ms_ds_goods (
 
 所有接口需登录（Sa-Token），通过网关访问路径 `/api/goods/**`。
 
+## 登录状态校验
+
+- 所有 `/api/goods/**` 接口要求登录，未登录返回 401。
+- 登录态由 Sa-Token 写入 Redis（`192.168.0.27:6379`），本模块只做校验。
+- OpenFeign 调用 `ms-ds-system` 的 GET 字典读接口时，会转发当前 `Authorization`；这些内部读接口本身不要求登录。
+- 前端收到 401 后跳转登录页，登录成功后回跳原请求页面。
+
 | 方法 | 路径 | 说明 |
 |------|------|------|
 | POST | `/api/goods` | 录入商品 |
@@ -86,7 +93,7 @@ CREATE TABLE ms_ds_goods (
 ```
 service-goods
   ├── Feign → ms-ds-system (获取商品分类字典)
-  └── Sa-Token SSO → service-user (鉴权)
+  └── Sa-Token 共享会话 → Redis (登录校验)
 ```
 
 ## 本地启动

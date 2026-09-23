@@ -32,6 +32,11 @@ public class UserServiceImpl implements UserService {
         return toProfile(user);
     }
 
+    @Override
+    public boolean exists(Long id) {
+        return userMapper.selectById(id) != null;
+    }
+
     private UserProfile toProfile(User user) {
         return new UserProfile(
                 user.getId(),

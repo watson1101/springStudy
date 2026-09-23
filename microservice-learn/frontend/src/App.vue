@@ -1,5 +1,8 @@
 <template>
-  <el-container style="min-height: 100vh">
+  <el-container v-if="$route.path === '/login'" style="min-height: 100vh">
+    <router-view />
+  </el-container>
+  <el-container v-else style="min-height: 100vh">
     <el-aside width="200px" style="background:#001529">
       <div style="color:#fff;padding:16px;font-weight:600">🛠️ 微服务学习</div>
       <el-menu
@@ -24,6 +27,7 @@
     <el-container>
       <el-header style="display:flex;align-items:center;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.1)">
         <h2 style="font-size:18px">{{ $route.meta.title || '微服务架构学习平台' }}</h2>
+        <el-button style="margin-left:auto" size="small" @click="logout">退出登录</el-button>
       </el-header>
       <el-main style="background:#f5f7fa">
         <router-view />
@@ -31,6 +35,22 @@
     </el-container>
   </el-container>
 </template>
+
+<script setup>
+import http from './api/http'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+
+async function logout() {
+  try {
+    await http.post('/user/auth/logout')
+  } finally {
+    localStorage.removeItem('ms_token')
+    router.push('/login')
+  }
+}
+</script>
 
 <style>
 body { margin: 0; font-family: -apple-system, "PingFang SC", sans-serif; }

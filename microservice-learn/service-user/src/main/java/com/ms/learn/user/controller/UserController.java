@@ -38,6 +38,12 @@ public class UserController {
         return Result.success(userService.getById(id));
     }
 
+    @GetMapping("/{id}/exists")
+    @SaCheckLogin
+    public Result<Boolean> exists(@PathVariable Long id) {
+        return Result.success(userService.exists(id));
+    }
+
     @PostMapping
     @SaCheckPermission("user:create")
     public Result<UserProfile> create(@Valid @RequestBody RegisterRequest request) {

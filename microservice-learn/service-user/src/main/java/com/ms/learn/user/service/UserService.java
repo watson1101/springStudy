@@ -9,4 +9,6 @@ public interface UserService {
     List<UserProfile> listAll();
 
     UserProfile getById(Long id);
+
+    boolean exists(Long id);
 }

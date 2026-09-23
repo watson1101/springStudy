@@ -1,5 +1,7 @@
 package com.ms.learn.common.exception;
 
+import cn.dev33.satoken.exception.NotLoginException;
+import cn.dev33.satoken.exception.NotPermissionException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
@@ -48,6 +50,20 @@ public class GlobalExceptionHandler {
                                                               HttpServletRequest request) {
         record(e, request);
         return ResponseEntity.badRequest().body(Result.fail(400, e.getMessage()));
+    }
+
+    /** 未登录：统一返回 401，由前端跳转登录页 */
+    @ExceptionHandler(NotLoginException.class)
+    public ResponseEntity<Result<Void>> handleNotLogin(NotLoginException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Result.fail(401, "请先登录"));
+    }
+
+    /** 无权限：统一返回 403 */
+    @ExceptionHandler(NotPermissionException.class)
+    public ResponseEntity<Result<Void>> handleNotPermission(NotPermissionException e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Result.fail(403, "没有访问权限"));
     }
 
     /** 兜底：未预期异常 */

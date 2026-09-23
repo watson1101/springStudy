@@ -5,8 +5,6 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import java.util.Map;
-
 /**
  * 声明式调用用户服务（OpenFeign 学习点）
  * <p>通过 Nacos 服务名 service-user 找到实例并调用。</p>
@@ -14,6 +12,6 @@ import java.util.Map;
 @FeignClient(name = "service-user")
 public interface UserFeignClient {
 
-    @GetMapping("/api/user/{id}")
-    Result<Map<String, Object>> getUser(@PathVariable("id") Long id);
+    @GetMapping("/api/user/{id}/exists")
+    Result<Boolean> userExists(@PathVariable("id") Long id);
 }

@@ -21,7 +21,6 @@ spring:
         namespace: public
         group: DEFAULT_GROUP
         file-extension: yaml
-
 # RocketMQ 配置
 rocketmq:
   name-server: 192.168.0.27:9876

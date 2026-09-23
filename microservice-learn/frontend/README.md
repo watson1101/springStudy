@@ -300,9 +300,18 @@ ssh hong@192.168.0.27 'kubectl apply -f /tmp/20-frontend.yaml'
 ## 八、待办 / 注意
 
 1. **flowable-service**：按需求仅配置未验证；需其注册 Nacos 后 `lb://` 才能转发成功。
-2. **登录态管理**：页面暂未实现 Sa-Token 票据存储与自动携带，因此 `/api/user/list`、
-   `/api/goods/list` 等接口返回 **401**（属预期行为，非故障）。
+2. **登录态管理**：已接入 Sa-Token 登录态校验，业务页面未登录会跳转 `/login`，
+   登录成功后回跳原页面；Axios 会自动携带 `Authorization: Bearer <token>`。
 3. **异常日志能力**：`common` 模块提供全局异常捕获，前端只需处理统一 `Result`
    结构（`code`/`message`/`data`）。
 4. **测试环境副本数**：k3s 单节点 CPU 有限，后端服务统一 **1 副本**；
    需要高可用时可扩容，但需同步评估节点 CPU requests 余量。
+---
+
+## 九、登录状态校验
+
+- 使用 Vue Router 全局守卫保护业务页面，未登录访问时跳转 `/login`。
+- 登录成功后按 `redirect` 参数回跳原请求页面。
+- Axios 请求自动携带 `Authorization: Bearer <token>`。
+- 收到 401 时清除本地 token 并跳转登录页。
+- 退出登录时会调用 `service-user` 的 `/api/user/auth/logout`。

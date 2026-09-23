@@ -20,7 +20,7 @@
 | 服务间调用 | Spring Cloud OpenFeign |
 | ORM | MyBatis-Plus 3.5.17 |
 | 数据库（异构） | PostgreSQL（用户/商品） + MySQL（订单/系统/工作流） |
-| 认证 / SSO | Sa-Token 1.46 + Sa-Token SSO（service-user 作为 SSO Server） |
+| 认证 / 登录态 | Sa-Token 1.46 + Redis 共享会话（service-user 作为登录中心） |
 | 工作流 | Flowable（flowable-service，端口 8007） |
 | CDC 数据同步 | mysql-binlog-connector 0.29（ms-ds-system 内置 Binlog 同步器） |
 | 消息 / 流处理对比 | RocketMQ 5.3.1 + Kafka 3.9（CP Kafka 7.7.1） + Apache Flink Demo |
@@ -40,7 +40,7 @@ microservice-learn/                     ← 根 POM (pom)
 ├── common/                             ← 公共包：Result 统一返回、BizException、全局异常捕获+异常日志（详见 common/README.md）
 ├── gateway/                            ← Spring Cloud Gateway（8000），含 Dockerfile
 │   └── src/main/resources/application.yml
-├── service-user/                       ← 用户 & SSO 中心（8001，PostgreSQL），含 Dockerfile
+├── service-user/                       ← 用户 & 登录中心（8001，PostgreSQL），含 Dockerfile
 ├── service-order/                      ← 订单服务（8002，MySQL + OpenFeign 调 user），含 Dockerfile
 ├── service-product/                    ← 商品服务（8003，PostgreSQL + Sentinel），含 Dockerfile
 ├── service-goods/                      ← 商品管理服务（8006，MySQL + Nacos + Sentinel + Sa-Token + Feign 调字典），含 Dockerfile
@@ -105,7 +105,7 @@ microservice-learn/                     ← 根 POM (pom)
  │ service │  │ service   │      │ service       │       │ ms-ds-system  │
  │ -user   │  │ -order    │      │ -product      │       │ 系统配置+CDC  │
  │ 8001 PG │  │ 8002 MySQL│      │ 8003 PG       │       │ 8090 MySQL    │
- │ SSO Server│ │ └─Feign──┼──────► getUser(id)  │       │               │
+ │ 登录中心 │ │ └─Feign──┼──────► getUser(id)  │       │               │
  │ Sa-Token │  └───────────┘      │ + Sentinel    │       │ Binlog 监听器│
  └────┬────┘                       └───────┬───────┘       └───────┬───────┘
       │  Sa-Token 票据/校验                │ Sentinel 规则上报         │
@@ -142,14 +142,33 @@ Gateway (/api/user|order|product/*  +  /sso/*)
 ```
 
 ### 4.2 跨服务调用（订单 → 用户）
-- `service-order` 通过 `@FeignClient(name="service-user")` `UserFeignClient#getUser(Long id)` 调用
+- `service-order` 通过 `@FeignClient(name="service-user")` `UserFeignClient#userExists(Long id)` 调用
 - 底层走 Nacos 服务发现 + 客户端侧负载均衡 + OpenFeign 编解码
-- **典型链路**：创建订单 → 校验下单用户存在性 / 拉取用户档案
+- **典型链路**：创建订单 → 校验下单用户存在性
 
-### 4.3 登录 / SSO（Sa-Token）
-- service-user 作为 **SSO Server**，暴露 `/sso/**` 入口（Gateway 直通）
-- 前端（clientId=`microservice-frontend`）通过 ticket 换 Token，`Authorization: Bearer <token>` 用于后续请求
+### 4.3 登录态共享（Sa-Token + Redis）
+- `service-user` 负责登录，并把 Sa-Token 会话写入 `192.168.0.27:6379`
+- 前端登录后保存 token，后续请求统一携带 `Authorization: Bearer <token>`
+- 各业务模块通过同一个 Redis 校验登录态；OpenFeign 内部调用会转发当前 `Authorization`
+- `ms-ds-system` 的 GET 字典读接口和健康检查免登录，供服务间调用与探测使用
+- `service-hotnews-collector` 的采集接口属于内部任务，不接入登录拦截；`service-hotnews-consumer` 仅热搜查询接口需要登录
 - Token 风格：`random-64`，超时 7200s，活跃超时 1800s
+
+#### 4.3.1 各模块登录拦截范围
+
+| 模块 | 登录拦截范围 | 备注 |
+|------|--------------|------|
+| `service-user` | `/api/user/**`，排除 `auth/login`、`auth/register` | 登录中心；写 Redis 会话 |
+| `service-order` | `/api/order/**` | Feign 调 `service-user` 时转发 `Authorization` |
+| `service-product` | `/api/product/**` | 全部业务接口需登录 |
+| `service-points` | `/api/points/**` | `earn/consume` 由 `service-transaction` 带 token 调用 |
+| `service-transaction` | `/api/payment/**` | Feign 调 `service-points` 时转发 `Authorization` |
+| `service-goods` | `/api/goods/**` | Feign 调 `ms-ds-system` 字典读接口免登录 |
+| `ms-ds-system` | `/api/system/**`，排除 GET 字典读接口和健康检查 | 字典写接口仍需登录 |
+| `flowable-service` | `/api/flowable/**` | 工作流接口需登录 |
+| `service-hotnews-collector` | 不拦截 | 定时采集 / 手动触发均为内部任务 |
+| `service-hotnews-consumer` | `/api/hotnews/latest`、`/api/hotnews/batch/**` | MQ 消费不走 HTTP 拦截器 |
+| `frontend` | 路由守卫 + 401 自动跳转 | 登录后回跳原页面 |
 
 ### 4.4 CDC 数据同步（ms-ds-system 独有）
 - 源：`192.168.0.40:3306/OPENCLAW_A_STOCK` → Binlog 订阅（server-id=65530）
@@ -213,7 +232,7 @@ Gateway (/api/user|order|product/*  +  /sso/*)
 | ⚠️ 配置中心 | 已接入 Nacos Config 依赖，但 `import-check.enabled=false`，当前仍用本地 yml；**推荐下一练习**：把数据库连接、Sentinel 地址迁到 Nacos，并练习多 profile 切换 |
 | ✅ 服务调用 | service-order → service-user 使用 OpenFeign，演示声明式 RPC |
 | ✅ 限流 / 熔断 | service-product 接入 Sentinel Dashboard；下一练习：在 Gateway 统一加限流，在 order 加降级规则 |
-| ✅ 认证 | Sa-Token SSO 模式已打通，前端可直接走 `/sso/*` 完成登录 |
+| ✅ 认证 | Sa-Token + Redis 共享会话已打通，前端登录后可访问受保护业务模块 |
 | ✅ 多数据库 | PostgreSQL + MySQL 双库对照，练手多数据源 / 跨库事务思维 |
 | ✅ 消息双体系 | RocketMQ + Kafka 同机部署，对照学习 Push/Pull、顺序、事务消息差异；并能直连 Flink |
 | ✅ CDC | 自研 Binlog 监听 + 可热配置启停，练习 "日志型 ETL" 思维 |

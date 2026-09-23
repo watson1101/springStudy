@@ -27,6 +27,11 @@ spring:
         namespace: public
         group: DEFAULT_GROUP
         file-extension: yaml
+  data:
+    redis:
+      host: 192.168.0.27
+      port: 6379
+      timeout: 5s
 
 # RocketMQ 配置
 rocketmq:
@@ -75,3 +80,15 @@ management:
     web:
       exposure:
         include: health,info
+
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  timeout: 7200
+  active-timeout: 1800
+  is-concurrent: true
+  is-share: false
+  is-read-header: true
+  is-read-cookie: true
+  is-write-header: true
+  token-style: random-64

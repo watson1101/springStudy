@@ -12,6 +12,11 @@ spring:
     username: root
     password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: 192.168.0.27
+      port: 6379
+      timeout: 5s
   config:
     import:
       - optional:nacos:service-points.yaml
@@ -46,3 +51,15 @@ points:
 logging:
   level:
     com.ms.learn: debug
+
+sa-token:
+  token-name: Authorization
+  token-prefix: Bearer
+  timeout: 7200
+  active-timeout: 1800
+  is-concurrent: true
+  is-share: false
+  is-read-header: true
+  is-read-cookie: true
+  is-write-header: true
+  token-style: random-64
