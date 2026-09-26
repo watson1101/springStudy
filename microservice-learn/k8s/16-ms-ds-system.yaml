@@ -14,7 +14,7 @@ metadata:
     tier: backend
     part-of: ms-learn
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 5
   strategy:
     type: RollingUpdate
@@ -77,7 +77,7 @@ spec:
           # 理由：MyBatis 多表+binlog（默认关）；比 user 档重
           resources:
             requests:
-              cpu: 300m
+              cpu: 50m
               memory: 768Mi
             limits:
               cpu: 800m

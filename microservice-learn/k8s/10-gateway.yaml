@@ -73,7 +73,7 @@ spec:
           # ---------- 资源 (理由：纯路由无状态，内存低) ----------
           resources:
             requests:
-              cpu: 200m
+              cpu: 50m
               memory: 384Mi
             limits:
               cpu: 500m

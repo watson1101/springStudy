@@ -13,7 +13,7 @@ metadata:
     tier: backend
     part-of: ms-learn
 spec:
-  replicas: 2
+  replicas: 1
   revisionHistoryLimit: 5
   strategy:
     type: RollingUpdate
@@ -70,7 +70,7 @@ spec:
           # 理由：2s 延时任务 + 积分 Feign；整体资源档与 user 一致
           resources:
             requests:
-              cpu: 200m
+              cpu: 50m
               memory: 512Mi
             limits:
               cpu: 500m

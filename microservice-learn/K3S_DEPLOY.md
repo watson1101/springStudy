@@ -358,7 +358,59 @@ location /api/ {
 
 ---
 
-## 八、常用运维命令
+## 八、资源配额（2026-09-26 优化）
+
+单节点 k3s 仅 **4 核 CPU**，因此按「测试环境够用」原则压降 requests，
+把调度额度留给后续扩展。
+
+### 8.1 各服务配额
+
+| 服务 | 副本 | CPU req | CPU lim | 内存 req | 内存 lim |
+|---|---|---|---|---|---|
+| ms-gateway | **2** | 50m | 500m | 384Mi | 768Mi |
+| ms-frontend | 1 | 50m | 200m | 64Mi | 256Mi |
+| service-user | 1 | 50m | 500m | 512Mi | 1Gi |
+| service-order | 1 | 50m | 500m | 512Mi | 1Gi |
+| service-product | 1 | 50m | 500m | 512Mi | 1Gi |
+| service-transaction | 1 | 50m | 500m | 512Mi | 1Gi |
+| service-points | 1 | 50m | 500m | 512Mi | 1Gi |
+| service-goods | 1 | 50m | 500m | 512Mi | 1Gi |
+| ms-ds-system | 1 | 50m | 800m | 768Mi | 1536Mi |
+| service-hotnews-collector | 1 | 50m | 500m | 384Mi | 768Mi |
+| service-hotnews-consumer | **2** | **100m** | 600m | 384Mi | 1Gi |
+| **合计** | 13 | **1150m (28%)** | 8700m (217%) | 8268Mi (26%) | 18346Mi (59%) |
+
+### 8.2 分配依据
+
+- **Spring Boot 服务平时几乎不耗 CPU**（实测 1-4m），只有启动和突发请求才冲高，
+  故 requests 统一压到 **50m**；limits 保持 **500m** 不动，保证启动不受限。
+- **ms-gateway 保留 2 副本**：它是集群唯一入口，单副本时滚动更新会导致
+  **所有 API 短暂中断**，多 50m 换可用性值得。
+- **hotnews-consumer 保留 2 副本 + 100m**：消费 RocketMQ 消息，
+  实测 CPU 使用最高（约 40-50m），且需要并发消费能力。
+- **ms-ds-system 内存 1.5Gi**：双数据源 + Binlog CDC 同步器，内存占用最高。
+- 前端与其余服务降为 **1 副本**：测试环境不要求高可用。
+
+### 8.3 优化前后对比
+
+| 指标 | 优化前 | 优化后 |
+|---|---|---|
+| CPU requests | 2900m (72%) | **1150m (28%)** |
+| Pod 总数 | 14 | 13 |
+
+**收益**：释放约 **1.75 核** 调度额度，为后续新增服务留出余量。
+
+### 8.4 注意事项
+
+> ⚠️ **内存 requests 是下一个瓶颈**（8268Mi / 26%）。若继续加服务，
+> **内存会比 CPU 先耗尽**，届时应先评估内存。
+>
+> ⚠️ **requests 只是调度预留**，不等于实际用量。改小 requests 不限制运行
+> （限制由 limits 决定）；但多个服务同时启动时，可能因超出 limits 而短暂变慢。
+
+---
+
+## 九、常用运维命令
 
 ```bash
 # 查看全部资源
@@ -383,7 +435,7 @@ kubectl describe node hong-ms-7970 | grep -A6 "Allocated resources"
 
 ---
 
-## 九、变更记录
+## 十、变更记录
 
 | 日期 | 变更 |
 |---|---|
