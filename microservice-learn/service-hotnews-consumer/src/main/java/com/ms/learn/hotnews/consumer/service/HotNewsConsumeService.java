@@ -64,7 +64,7 @@ public class HotNewsConsumeService {
             e.setHotValue(m.getHotValue() == null ? 0L : m.getHotValue());
             e.setRankNo(m.getRankNo() == null ? 0 : m.getRankNo());
             e.setSource(m.getSource() == null ? "toutiao" : m.getSource());
-            e.setUrl(m.getUrl());
+            e.setUrl(cleanUrl(m.getUrl()));
             e.setBatchId(batchId);
             e.setCollectTime(m.getCollectTime() == null ? LocalDateTime.now() : m.getCollectTime());
 
@@ -80,6 +80,32 @@ public class HotNewsConsumeService {
                 saveLog(batchId, System.currentTimeMillis() - start);
             }
         }
+    }
+
+    /**
+     * 清理热榜 URL，剔除跟踪参数（兜底）。
+     *
+     * <p>采集端已在投递前清理，此处为防御：历史消息或异常来源仍可能携带
+     * 约 800+ 字符的埋点参数（log_pb / impr_id 等），入库前再统一裁剪，
+     * 保证库内 URL 只保留 {@code scheme://host/path}。</p>
+     *
+     * @param url 原始 URL
+     * @return 精简后的 URL；入参为空时返回空串
+     */
+    static String cleanUrl(String url) {
+        if (url == null || url.trim().isEmpty()) {
+            return "";
+        }
+        String trimmed = url.trim();
+        int idx = trimmed.indexOf('?');
+        if (idx >= 0) {
+            trimmed = trimmed.substring(0, idx);
+        }
+        idx = trimmed.indexOf('#');
+        if (idx >= 0) {
+            trimmed = trimmed.substring(0, idx);
+        }
+        return trimmed;
     }
 
     /**

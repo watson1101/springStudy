@@ -37,7 +37,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: service-hotnews-consumer
-          image: localhost:5000/ms-learn/service-hotnews-consumer:1.0.0
+          image: localhost:5000/ms-learn/service-hotnews-consumer:1.0.1
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8009

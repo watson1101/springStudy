@@ -56,7 +56,7 @@ public class HotNewsCollectService {
                 m.setHotValue(parseHotValue(item.getHotValue()));
                 m.setRankNo(rank++);
                 m.setSource("toutiao");
-                m.setUrl(item.getUrl());
+                m.setUrl(cleanUrl(item.getUrl()));
                 m.setBatchId(batchId);
                 m.setCollectTime(LocalDateTime.now());
                 messages.add(m);
@@ -107,6 +107,32 @@ public class HotNewsCollectService {
             log.error("采集投递失败 batchId={}, 耗时={}ms", batchId, cost, e);
             throw new RuntimeException("采集投递失败: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * 清理热榜 URL，剔除跟踪参数。
+     *
+     * <p>头条热榜原始 URL 携带大量埋点参数（category_name / log_pb / impr_id /
+     * style_id 等），单条约 800+ 字符，入库后既占空间又影响展示。
+     * 实际有效的只有 {@code scheme://host/path} 部分，查询串与锚点均可丢弃。</p>
+     *
+     * @param url 原始 URL
+     * @return 精简后的 URL；入参为空时返回空串
+     */
+    static String cleanUrl(String url) {
+        if (StrUtil.isBlank(url)) {
+            return "";
+        }
+        String trimmed = url.trim();
+        int idx = trimmed.indexOf('?');
+        if (idx >= 0) {
+            trimmed = trimmed.substring(0, idx);
+        }
+        idx = trimmed.indexOf('#');
+        if (idx >= 0) {
+            trimmed = trimmed.substring(0, idx);
+        }
+        return trimmed;
     }
 
     private Long parseHotValue(String hotValue) {
