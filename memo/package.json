@@ -15,7 +15,7 @@
     "node-cron": "^3.0.3"
   },
   "devDependencies": {
-    "electron": "^33.0.0",
+    "electron": "^41.10.6",
     "electron-builder": "^25.1.8"
   },
   "build": {
